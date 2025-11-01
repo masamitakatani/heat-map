@@ -1,0 +1,62 @@
+{
+  "name": "heat-map",
+  "path": "/Users/masamitakatani/Desktop/heat-map",
+  "createdAt": "2025-11-01T13:21:46.440Z",
+  "phases": [
+    {
+      "number": 1,
+      "name": "要件定義",
+      "status": "pending"
+    },
+    {
+      "number": 2,
+      "name": "技術選定",
+      "status": "pending"
+    },
+    {
+      "number": 3,
+      "name": "データベース設計",
+      "status": "pending"
+    },
+    {
+      "number": 4,
+      "name": "API設計",
+      "status": "pending"
+    },
+    {
+      "number": 5,
+      "name": "フロントエンド設計",
+      "status": "pending"
+    },
+    {
+      "number": 6,
+      "name": "実装（バックエンド）",
+      "status": "pending"
+    },
+    {
+      "number": 7,
+      "name": "実装（フロントエンド）",
+      "status": "pending"
+    },
+    {
+      "number": 8,
+      "name": "テスト",
+      "status": "pending"
+    },
+    {
+      "number": 9,
+      "name": "デプロイ設定",
+      "status": "pending"
+    },
+    {
+      "number": 10,
+      "name": "本番デプロイ",
+      "status": "pending"
+    },
+    {
+      "number": 11,
+      "name": "ドキュメント作成",
+      "status": "pending"
+    }
+  ]
+}
