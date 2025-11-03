@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ヒートマップ & ファネル解析ツール - LP</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      /* ヒーローセクション */
+      .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 100px 20px;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
+
+      .hero p {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+
+      .hero .cta-button {
+        background-color: #ff6b6b;
+        color: white;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .hero .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* 機能紹介セクション */
+      .features {
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 0 20px;
+      }
+
+      .features h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 60px;
+        color: #667eea;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #667eea;
+      }
+
+      .feature-card p {
+        color: #666;
+        line-height: 1.8;
+      }
+
+      /* デモセクション */
+      .demo {
+        background-color: #f7f9fc;
+        padding: 80px 20px;
+      }
+
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .demo h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 40px;
+        color: #667eea;
+      }
+
+      .demo-area {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        min-height: 300px;
+      }
+
+      .demo-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin: 10px;
+        transition: background-color 0.3s;
+      }
+
+      .demo-button:hover {
+        background-color: #45a049;
+      }
+
+      .demo-button.secondary {
+        background-color: #2196F3;
+      }
+
+      .demo-button.secondary:hover {
+        background-color: #0b7dda;
+      }
+
+      /* 料金セクション */
+      .pricing {
+        max-width: 1200px;
+        margin: 80px auto;
+        padding: 0 20px;
+      }
+
+      .pricing h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 60px;
+        color: #667eea;
+      }
+
+      .pricing-card {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .pricing-card h3 {
+        font-size: 2rem;
+        color: #667eea;
+        margin-bottom: 20px;
+      }
+
+      .pricing-card .price {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #ff6b6b;
+        margin-bottom: 20px;
+      }
+
+      .pricing-card ul {
+        text-align: left;
+        list-style: none;
+        margin-bottom: 30px;
+      }
+
+      .pricing-card ul li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .pricing-card ul li:before {
+        content: "✓ ";
+        color: #4CAF50;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      /* フッター */
+      footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+        margin-top: 80px;
+      }
+
+      /* レスポンシブ */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 1.2rem;
+        }
+
+        .features h2,
+        .demo h2,
+        .pricing h2 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ヒーローセクション -->
+    <section class="hero">
+      <h1>🔥 ヒートマップ & ファネル解析ツール</h1>
+      <p>ユーザー行動を可視化し、コンバージョン率を最大化</p>
+      <a href="#demo" class="cta-button">今すぐ無料で試す</a>
+    </section>
+
+    <!-- 機能紹介セクション -->
+    <section class="features">
+      <h2>3つの主要機能</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>📊 クリックヒートマップ</h3>
+          <p>
+            ユーザーがどこをクリックしているか一目で把握。
+            ホットスポットを特定し、UI改善に活用できます。
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>📈 スクロールヒートマップ</h3>
+          <p>
+            ページのどこまでスクロールされているか可視化。
+            重要なコンテンツを最適な位置に配置できます。
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>🎯 ファネル解析</h3>
+          <p>
+            ユーザーの離脱ポイントを特定し、コンバージョン率を改善。
+            Connected Oneと連携して強力な分析を実現します。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- デモセクション -->
+    <section id="demo" class="demo">
+      <div class="demo-container">
+        <h2>今すぐ試してみる</h2>
+        <div class="demo-area">
+          <p style="text-align: center; font-size: 1.2rem; margin-bottom: 30px;">
+            このページで実際にヒートマップ機能をお試しください！
+          </p>
+          <div style="text-align: center;">
+            <button class="demo-button" onclick="trackDemoClick('Button A')">ボタンA</button>
+            <button class="demo-button secondary" onclick="trackDemoClick('Button B')">ボタンB</button>
+            <button class="demo-button" onclick="trackDemoClick('Button C')">ボタンC</button>
+          </div>
+          <p style="text-align: center; margin-top: 30px; color: #666;">
+            クリックするとヒートマップにデータが記録されます
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 料金セクション -->
+    <section class="pricing">
+      <h2>料金プラン</h2>
+      <div class="pricing-card">
+        <h3>フリープラン</h3>
+        <div class="price">¥0<span style="font-size: 1rem; color: #666;">/月</span></div>
+        <ul>
+          <li>クリックヒートマップ</li>
+          <li>スクロールヒートマップ</li>
+          <li>ファネル解析（Connected One連携）</li>
+          <li>LocalStorageベース（5MB）</li>
+          <li>サーバーレス設計（維持費ゼロ）</li>
+          <li>軽量スクリプト（9.30KB gzip圧縮）</li>
+        </ul>
+        <a href="#demo" class="cta-button">今すぐ始める</a>
+      </div>
+    </section>
+
+    <!-- フッター -->
+    <footer>
+      <p>&copy; 2025 Heatmap Analytics. All rights reserved.</p>
+      <p>Powered by Connected One</p>
+    </footer>
+
+    <!-- ヒートマップライブラリ統合 -->
+    <script src="https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/heatmap-analytics.umd.js"></script>
+    <script>
+      // ライブラリ初期化
+      if (window.HeatmapAnalytics) {
+        console.log('✅ ヒートマップライブラリ読み込み成功');
+
+        // 初期化（実際のAPIキーに置き換えてください）
+        try {
+          const tracker = new window.HeatmapAnalytics({
+            api: {
+              apiKey: 'test-key-123',
+              projectId: 'proj_lp_test',
+              baseUrl: 'https://api.connected-one.com/v1'
+            },
+            debug: true,
+            autoStart: true,
+          });
+
+          tracker.init();
+          console.log('✅ ヒートマップ初期化成功');
+          console.log('Session ID:', tracker.getSessionId());
+          console.log('Anonymous ID:', tracker.getAnonymousId());
+
+          // グローバルに公開（デバッグ用）
+          window.heatmapTracker = tracker;
+        } catch (error) {
+          console.error('❌ ヒートマップ初期化エラー:', error);
+        }
+      } else {
+        console.error('❌ ヒートマップライブラリが読み込まれていません');
+      }
+
+      // デモボタンのクリック追跡
+      window.trackDemoClick = function(buttonName) {
+        console.log(`🖱️ ${buttonName} がクリックされました`);
+        alert(`${buttonName} をクリックしました！\nヒートマップにデータが記録されました。`);
+      };
+    </script>
+  </body>
+</html>

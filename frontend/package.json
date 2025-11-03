@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && cp lp.html dist/lp.html",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types",
     "preview": "vite preview",
     "size": "npm run build && gzip -c dist/heatmap-analytics.umd.js | wc -c",
