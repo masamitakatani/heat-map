@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登録完了 - ヒートマップテスト</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 600px;
+      background: white;
+      padding: 60px 40px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 30px;
+      background: #4caf50;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #4caf50;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .back-button:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-icon">✓</div>
+    <h1>登録完了!</h1>
+    <p>
+      ご登録ありがとうございます。<br>
+      メールアドレスに確認メールを送信しました。
+    </p>
+    <p>
+      これからヒートマップツールを使って、<br>
+      LPのパフォーマンスを最大化しましょう。
+    </p>
+    <a href="./index.html" class="back-button" data-testid="back-button">
+      トップページへ戻る
+    </a>
+  </div>
+
+  <script>
+    // ファネルステップ3を記録(コンバージョン達成)
+    (function() {
+      const funnelEvents = JSON.parse(localStorage.getItem('heatmap_funnel_events') || '[]');
+      funnelEvents.push({
+        step: 3,
+        timestamp: Date.now(),
+        url: window.location.href,
+        converted: true
+      });
+      localStorage.setItem('heatmap_funnel_events', JSON.stringify(funnelEvents));
+    })();
+  </script>
+</body>
+</html>

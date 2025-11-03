@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヒートマップテスト - ランディングページ</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 200vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 16px 32px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .cta-button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 60px;
+    }
+
+    .feature-card {
+      padding: 30px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: #667eea;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-card h3 {
+      color: #667eea;
+      margin-top: 0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ヒートマップ & ファネル解析ツール</h1>
+
+    <p>
+      ユーザー行動を可視化し、LP改善を加速するツールです。
+      クリック、スクロール、マウスムーブメントを記録して、
+      データに基づいた意思決定を実現します。
+    </p>
+
+    <button class="cta-button" data-testid="cta-button">
+      無料で試してみる
+    </button>
+
+    <div class="features">
+      <div class="feature-card" data-testid="feature-click">
+        <h3>クリックヒートマップ</h3>
+        <p>ユーザーがどこをクリックしているかを色の濃淡で可視化します。</p>
+      </div>
+
+      <div class="feature-card" data-testid="feature-scroll">
+        <h3>スクロールヒートマップ</h3>
+        <p>ページのどこまでスクロールされているかを把握できます。</p>
+      </div>
+
+      <div class="feature-card" data-testid="feature-mouse">
+        <h3>マウスムーブメント</h3>
+        <p>マウスカーソルの軌跡から注目エリアを特定します。</p>
+      </div>
+
+      <div class="feature-card" data-testid="feature-funnel">
+        <h3>ファネル解析</h3>
+        <p>複数ページにまたがるユーザー遷移を分析できます。</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 80px;">
+      <h2>使い方は簡単</h2>
+      <ol>
+        <li>スクリプトタグをLPに埋め込む</li>
+        <li>ユーザーの行動データを自動収集</li>
+        <li>ヒートマップで可視化して改善点を発見</li>
+      </ol>
+    </div>
+
+    <div style="margin-top: 80px; text-align: center;">
+      <button class="cta-button" data-testid="bottom-cta">
+        今すぐ始める
+      </button>
+    </div>
+  </div>
+
+  <!-- ヒートマップライブラリ読み込み(テスト用) -->
+  <script>
+    // LocalStorageベースのシンプルなヒートマップトラッキング
+    (function() {
+      const HeatmapAnalytics = {
+        init: function() {
+          this.trackClicks();
+          this.trackScrolls();
+          this.trackMouseMoves();
+          console.log('HeatmapAnalytics initialized');
+        },
+
+        trackClicks: function() {
+          document.addEventListener('click', (e) => {
+            const clicks = JSON.parse(localStorage.getItem('heatmap_clicks') || '[]');
+            clicks.push({
+              x: e.clientX,
+              y: e.clientY,
+              timestamp: Date.now()
+            });
+
+            // 最大1000件まで保存
+            if (clicks.length > 1000) {
+              clicks.shift();
+            }
+
+            localStorage.setItem('heatmap_clicks', JSON.stringify(clicks));
+          });
+        },
+
+        trackScrolls: function() {
+          let scrollTimeout;
+          window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+              const scrolls = JSON.parse(localStorage.getItem('heatmap_scrolls') || '[]');
+              const scrollDepth = window.scrollY;
+              const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
+              const percentage = pageHeight > 0 ? (scrollDepth / pageHeight) * 100 : 0;
+
+              scrolls.push({
+                depth: scrollDepth,
+                percentage: Math.round(percentage),
+                timestamp: Date.now()
+              });
+
+              if (scrolls.length > 500) {
+                scrolls.shift();
+              }
+
+              localStorage.setItem('heatmap_scrolls', JSON.stringify(scrolls));
+            }, 100);
+          });
+        },
+
+        trackMouseMoves: function() {
+          let mouseMoveTimeout;
+          let moveCount = 0;
+
+          document.addEventListener('mousemove', (e) => {
+            // サンプリング: 10回に1回だけ記録
+            moveCount++;
+            if (moveCount % 10 !== 0) return;
+
+            clearTimeout(mouseMoveTimeout);
+            mouseMoveTimeout = setTimeout(() => {
+              const moves = JSON.parse(localStorage.getItem('heatmap_mouse_moves') || '[]');
+
+              moves.push({
+                x: e.clientX,
+                y: e.clientY,
+                timestamp: Date.now()
+              });
+
+              if (moves.length > 500) {
+                moves.shift();
+              }
+
+              localStorage.setItem('heatmap_mouse_moves', JSON.stringify(moves));
+            }, 50);
+          });
+        }
+      };
+
+      // グローバルに公開
+      window.HeatmapAnalytics = HeatmapAnalytics;
+
+      // 初期化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => HeatmapAnalytics.init());
+      } else {
+        HeatmapAnalytics.init();
+      }
+
+      // ファネルステップ1を記録
+      const config = localStorage.getItem('heatmap_funnel_config');
+      if (config) {
+        const events = JSON.parse(localStorage.getItem('heatmap_funnel_events') || '[]');
+        events.push({
+          step: 1,
+          timestamp: Date.now(),
+          url: window.location.href
+        });
+        localStorage.setItem('heatmap_funnel_events', JSON.stringify(events));
+      }
+    })();
+  </script>
+</body>
+</html>

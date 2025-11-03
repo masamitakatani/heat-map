@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>オプトインページ - ヒートマップテスト</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 600px;
+      background: white;
+      padding: 60px 40px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    input[type="email"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #f5576c;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 16px;
+      background: #f5576c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .submit-button:hover {
+      background: #e04658;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>無料トライアルに登録</h1>
+    <p>メールアドレスを入力して、今すぐヒートマップツールを試してみましょう。</p>
+
+    <form id="optinForm" data-testid="optin-form">
+      <div class="form-group">
+        <label for="name">お名前</label>
+        <input type="text" id="name" name="name" required data-testid="name-input">
+      </div>
+
+      <div class="form-group">
+        <label for="email">メールアドレス</label>
+        <input type="email" id="email" name="email" required data-testid="email-input">
+      </div>
+
+      <button type="submit" class="submit-button" data-testid="submit-button">
+        無料で始める
+      </button>
+    </form>
+  </div>
+
+  <script>
+    // ファネルステップ2を記録
+    (function() {
+      const funnelEvents = JSON.parse(localStorage.getItem('heatmap_funnel_events') || '[]');
+      funnelEvents.push({
+        step: 2,
+        timestamp: Date.now(),
+        url: window.location.href
+      });
+      localStorage.setItem('heatmap_funnel_events', JSON.stringify(funnelEvents));
+
+      // フォーム送信処理
+      document.getElementById('optinForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // サンクスページへ遷移
+        window.location.href = './thanks.html';
+      });
+    })();
+  </script>
+</body>
+</html>

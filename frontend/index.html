@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/typescript.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heatmap Analytics - API統合テスト</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        border-bottom: 3px solid #4CAF50;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #555;
+        margin-top: 30px;
+      }
+      .section {
+        margin-bottom: 30px;
+      }
+      button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 5px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      button.secondary {
+        background-color: #2196F3;
+      }
+      button.secondary:hover {
+        background-color: #0b7dda;
+      }
+      button.danger {
+        background-color: #f44336;
+      }
+      button.danger:hover {
+        background-color: #da190b;
+      }
+      .config-form {
+        display: grid;
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      input {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      .info-box {
+        background-color: #e7f3ff;
+        border-left: 4px solid #2196F3;
+        padding: 15px;
+        margin: 15px 0;
+      }
+      #output {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 4px;
+        min-height: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+      }
+      .output-line {
+        margin: 5px 0;
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+      }
+      .output-success {
+        color: #4CAF50;
+      }
+      .output-error {
+        color: #f44336;
+      }
+      .output-info {
+        color: #2196F3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔥 Heatmap Analytics - API統合テスト</h1>
+
+      <div class="info-box">
+        <strong>📌 このページについて:</strong> API統合のテスト用ページです。Connected One APIとの接続、Webhook送信、TanStack Queryの動作確認ができます。
+      </div>
+
+      <!-- 初期化セクション -->
+      <div class="section">
+        <h2>1. 初期化設定</h2>
+        <div class="config-form">
+          <div class="form-group">
+            <label for="apiKey">APIキー</label>
+            <input type="text" id="apiKey" placeholder="your-api-key-here" value="test-key-123" />
+          </div>
+          <div class="form-group">
+            <label for="projectId">プロジェクトID</label>
+            <input type="text" id="projectId" placeholder="proj_abc123" value="proj_test_001" />
+          </div>
+          <div class="form-group">
+            <label for="baseUrl">API Base URL</label>
+            <input type="text" id="baseUrl" value="https://api.connected-one.com/v1" />
+          </div>
+        </div>
+        <button onclick="initializeHeatmap()">初期化</button>
+        <button class="secondary" onclick="checkInitStatus()">初期化状態を確認</button>
+      </div>
+
+      <!-- API呼び出しテスト -->
+      <div class="section">
+        <h2>2. API呼び出しテスト</h2>
+        <button onclick="testFetchFunnels()">ファネル情報を取得</button>
+        <button onclick="testFetchProjectSettings()">プロジェクト設定を取得</button>
+      </div>
+
+      <!-- Webhookテスト -->
+      <div class="section">
+        <h2>3. Webhook送信テスト</h2>
+        <button onclick="testSendFunnelCompleted()">ファネル完了イベント送信</button>
+        <button onclick="testSendFunnelDropoff()">ファネル離脱イベント送信</button>
+        <button class="secondary" onclick="testFlushQueue()">Webhookキューをフラッシュ</button>
+      </div>
+
+      <!-- データ管理 -->
+      <div class="section">
+        <h2>4. データ管理</h2>
+        <button class="danger" onclick="clearAllData()">全データをクリア</button>
+        <button class="secondary" onclick="showLocalStorageData()">LocalStorageを表示</button>
+      </div>
+
+      <!-- 出力エリア -->
+      <div class="section">
+        <h2>📊 実行結果</h2>
+        <div id="output"></div>
+        <button class="secondary" onclick="clearOutput()">出力をクリア</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import HeatmapAnalytics from './src/main.ts';
+      import {
+        sendWebhook,
+        flushWebhookQueue
+      } from './src/api/index.ts';
+
+      // グローバルに公開（テスト用）
+      window.HeatmapAnalytics = HeatmapAnalytics;
+      window.HeatmapAPI = {
+        sendWebhook,
+        flushWebhookQueue
+      };
+
+      let tracker = null;
+
+      // 出力ヘルパー
+      window.log = (message, type = 'info') => {
+        const output = document.getElementById('output');
+        const line = document.createElement('div');
+        line.className = `output-line output-${type}`;
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        output.appendChild(line);
+        output.scrollTop = output.scrollHeight;
+        console.log(message);
+      };
+
+      window.clearOutput = () => {
+        document.getElementById('output').innerHTML = '';
+      };
+
+      // 1. 初期化
+      window.initializeHeatmap = () => {
+        const apiKey = document.getElementById('apiKey').value;
+        const projectId = document.getElementById('projectId').value;
+        const baseUrl = document.getElementById('baseUrl').value;
+
+        if (!apiKey || !projectId) {
+          log('エラー: APIキーとプロジェクトIDを入力してください', 'error');
+          return;
+        }
+
+        try {
+          tracker = new HeatmapAnalytics({
+            api: { apiKey, projectId, baseUrl },
+            debug: true,
+            autoStart: false,
+          });
+          tracker.init();
+          log('✅ 初期化成功', 'success');
+        } catch (error) {
+          log(`❌ 初期化エラー: ${error.message}`, 'error');
+        }
+      };
+
+      window.checkInitStatus = () => {
+        if (tracker) {
+          log(`✅ 初期化済み - SessionID: ${tracker.getSessionId()}`, 'success');
+          log(`   AnonymousID: ${tracker.getAnonymousId()}`, 'info');
+        } else {
+          log('❌ 未初期化', 'error');
+        }
+      };
+
+      // 2. API呼び出しテスト
+      window.testFetchFunnels = async () => {
+        const projectId = document.getElementById('projectId').value;
+        if (!projectId) {
+          log('エラー: プロジェクトIDを入力してください', 'error');
+          return;
+        }
+
+        log('📡 ファネル情報を取得中...', 'info');
+        try {
+          const { fetchFunnels } = await import('./src/api/connectedOne.ts');
+          const response = await fetchFunnels(projectId);
+
+          if (response.error) {
+            log(`❌ エラー: ${response.error.message}`, 'error');
+          } else {
+            log(`✅ ファネル取得成功: ${response.data.length}件`, 'success');
+            log(JSON.stringify(response.data, null, 2), 'info');
+          }
+        } catch (error) {
+          log(`❌ 例外: ${error.message}`, 'error');
+        }
+      };
+
+      window.testFetchProjectSettings = async () => {
+        const projectId = document.getElementById('projectId').value;
+        if (!projectId) {
+          log('エラー: プロジェクトIDを入力してください', 'error');
+          return;
+        }
+
+        log('📡 プロジェクト設定を取得中...', 'info');
+        try {
+          const { fetchProjectSettings } = await import('./src/api/connectedOne.ts');
+          const response = await fetchProjectSettings(projectId);
+
+          if (response.error) {
+            log(`❌ エラー: ${response.error.message}`, 'error');
+          } else {
+            log('✅ プロジェクト設定取得成功', 'success');
+            log(JSON.stringify(response.data, null, 2), 'info');
+          }
+        } catch (error) {
+          log(`❌ 例外: ${error.message}`, 'error');
+        }
+      };
+
+      // 3. Webhookテスト
+      window.testSendFunnelCompleted = async () => {
+        const projectId = document.getElementById('projectId').value;
+        if (!tracker) {
+          log('エラー: 先に初期化してください', 'error');
+          return;
+        }
+
+        const payload = {
+          event_type: 'funnel.completed',
+          project_id: projectId,
+          funnel_id: 'funnel_test_001',
+          user: {
+            anonymous_id: tracker.getAnonymousId(),
+            session_id: tracker.getSessionId(),
+          },
+          funnel_data: {
+            funnel_name: 'テストファネル',
+            total_steps: 3,
+            completed_steps: [0, 1, 2],
+            started_at: new Date(Date.now() - 600000).toISOString(),
+            completed_at: new Date().toISOString(),
+            duration_seconds: 600,
+          },
+          device: {
+            type: 'desktop',
+            viewport_width: window.innerWidth,
+            viewport_height: window.innerHeight,
+          },
+          timestamp: new Date().toISOString(),
+        };
+
+        log('📡 ファネル完了Webhookを送信中...', 'info');
+        try {
+          const response = await window.HeatmapAPI.sendWebhook(payload);
+          if (response.error) {
+            log(`⚠️ ${response.error.message}`, 'error');
+          } else {
+            log('✅ Webhook送信成功', 'success');
+          }
+        } catch (error) {
+          log(`❌ 例外: ${error.message}`, 'error');
+        }
+      };
+
+      window.testSendFunnelDropoff = async () => {
+        const projectId = document.getElementById('projectId').value;
+        if (!tracker) {
+          log('エラー: 先に初期化してください', 'error');
+          return;
+        }
+
+        const payload = {
+          event_type: 'funnel.dropped_off',
+          project_id: projectId,
+          funnel_id: 'funnel_test_001',
+          user: {
+            anonymous_id: tracker.getAnonymousId(),
+            session_id: tracker.getSessionId(),
+          },
+          funnel_data: {
+            funnel_name: 'テストファネル',
+            total_steps: 3,
+            completed_steps: [0, 1],
+            dropoff_step: 1,
+            dropoff_step_name: 'ステップ2',
+            started_at: new Date(Date.now() - 300000).toISOString(),
+            dropped_at: new Date().toISOString(),
+            duration_seconds: 300,
+          },
+          device: {
+            type: 'desktop',
+            viewport_width: window.innerWidth,
+            viewport_height: window.innerHeight,
+          },
+          timestamp: new Date().toISOString(),
+        };
+
+        log('📡 ファネル離脱Webhookを送信中...', 'info');
+        try {
+          const response = await window.HeatmapAPI.sendWebhook(payload);
+          if (response.error) {
+            log(`⚠️ ${response.error.message}`, 'error');
+          } else {
+            log('✅ Webhook送信成功', 'success');
+          }
+        } catch (error) {
+          log(`❌ 例外: ${error.message}`, 'error');
+        }
+      };
+
+      window.testFlushQueue = async () => {
+        log('📡 Webhookキューをフラッシュ中...', 'info');
+        try {
+          await window.HeatmapAPI.flushWebhookQueue();
+          log('✅ キューフラッシュ完了', 'success');
+        } catch (error) {
+          log(`❌ 例外: ${error.message}`, 'error');
+        }
+      };
+
+      // 4. データ管理
+      window.clearAllData = () => {
+        if (tracker) {
+          tracker.clearData();
+          log('✅ 全データをクリアしました', 'success');
+        } else {
+          log('エラー: 先に初期化してください', 'error');
+        }
+      };
+
+      window.showLocalStorageData = () => {
+        log('📦 LocalStorage内容:', 'info');
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('heatmap_')) {
+            const value = localStorage.getItem(key);
+            log(`  ${key}: ${value.substring(0, 100)}...`, 'info');
+          }
+        }
+      };
+    </script>
+  </body>
+</html>
