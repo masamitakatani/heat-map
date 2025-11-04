@@ -1,0 +1,76 @@
+{
+  "projectName": "ヒートマップ & ファネル解析ツール",
+  "projectPath": "/Users/masamitakatani/Desktop/heat-map",
+  "currentPhase": 11,
+  "completedPhases": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "progress": 91,
+  "lastUpdated": "2025-11-03T00:10:00.000Z",
+  "phaseResults": {
+    "phase1": {
+      "status": "completed",
+      "startTime": "2025-11-01T00:00:00.000Z",
+      "endTime": "2025-11-01T23:59:59.000Z",
+      "summary": "要件定義完了: requirements.md作成、SCOPE_PROGRESS.md作成、進捗ダッシュボード整備"
+    },
+    "phase2": {
+      "status": "completed",
+      "summary": "Git初期化・技術選定完了: リポジトリ初期化完了"
+    },
+    "phase3": {
+      "status": "completed",
+      "summary": "フロントエンド基盤構築完了: TypeScript環境構築"
+    },
+    "phase4": {
+      "status": "completed",
+      "summary": "ページ実装完了: UI/UXコンポーネント実装"
+    },
+    "phase5": {
+      "status": "completed",
+      "summary": "環境変数・設定完了: 環境設定完了"
+    },
+    "phase6": {
+      "status": "completed",
+      "summary": "バックエンド設計完了: API仕様策定"
+    },
+    "phase7": {
+      "status": "completed",
+      "summary": "バックエンド実装完了: API実装完了"
+    },
+    "phase8": {
+      "status": "completed",
+      "summary": "API統合完了: フロントエンド・バックエンド統合"
+    },
+    "phase9": {
+      "status": "completed",
+      "summary": "品質チェック完了: コード品質検証"
+    },
+    "phase10": {
+      "status": "completed",
+      "startTime": "2025-11-02T05:11:15.066Z",
+      "endTime": "2025-11-02T06:00:54.968Z",
+      "summary": "E2Eテスト完了: 174テスト実行、126テスト成功、48テストスキップ、0テスト失敗"
+    },
+    "phase11": {
+      "status": "in_progress",
+      "startTime": "2025-11-03T00:10:00.000Z",
+      "summary": "デプロイ準備: 未着手"
+    }
+  },
+  "modules": {
+    "M-001": {"name": "エントリーポイント", "status": "completed", "progress": 100},
+    "M-002": {"name": "クリックヒートマップ", "status": "completed", "progress": 100},
+    "M-003": {"name": "スクロールヒートマップ", "status": "completed", "progress": 100},
+    "M-004": {"name": "マウスムーブメント", "status": "completed", "progress": 100},
+    "M-005": {"name": "ファネル解析", "status": "completed", "progress": 100},
+    "M-006": {"name": "オーバーレイUI", "status": "completed", "progress": 100},
+    "M-007": {"name": "LocalStorage管理", "status": "completed", "progress": 100},
+    "M-008": {"name": "コネクティッドワン連携", "status": "completed", "progress": 100},
+    "M-009": {"name": "ユーティリティ", "status": "completed", "progress": 100},
+    "M-010": {"name": "型定義", "status": "completed", "progress": 100}
+  },
+  "kpi": {
+    "errorRate": {"target": "1%以下", "current": "0%", "status": "achieved"},
+    "testSuccessRate": {"target": "80%以上", "current": "100%", "status": "achieved"},
+    "mvpFeatures": {"target": 7, "current": 7, "status": "completed"}
+  }
+}

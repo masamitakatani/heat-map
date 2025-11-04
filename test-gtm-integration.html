@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTM統合テスト - ヒートマップライブラリ</title>
+  <style>
+    body {
+      font-family: "Yu Gothic", sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.8;
+    }
+
+    h1 {
+      color: #1976d2;
+      border-bottom: 3px solid #1976d2;
+      padding-bottom: 10px;
+    }
+
+    .test-section {
+      background: #f5f5f5;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border-left: 5px solid #1976d2;
+    }
+
+    .test-section h2 {
+      margin-top: 0;
+      color: #424242;
+    }
+
+    .status {
+      padding: 10px 20px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .status.success {
+      background: #e8f5e9;
+      color: #4caf50;
+      border-left: 4px solid #4caf50;
+    }
+
+    .status.error {
+      background: #ffebee;
+      color: #f44336;
+      border-left: 4px solid #f44336;
+    }
+
+    .status.pending {
+      background: #fff3e0;
+      color: #ff9800;
+      border-left: 4px solid #ff9800;
+    }
+
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #1565c0;
+    }
+
+    code {
+      background: #263238;
+      color: #aed581;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: "Courier New", monospace;
+    }
+
+    pre {
+      background: #263238;
+      color: #aed581;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .log-entry {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+    }
+
+    .log-entry.success {
+      color: #4caf50;
+    }
+
+    .log-entry.error {
+      color: #f44336;
+    }
+
+    .log-entry.info {
+      color: #2196F3;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 GTM統合テスト - ヒートマップライブラリ</h1>
+
+  <div class="test-section">
+    <h2>📋 テスト概要</h2>
+    <p>このページでは、GTMのカスタムHTMLタグ経由でヒートマップライブラリが正しく動作するかをテストします。</p>
+    <p>実際のGTM環境をシミュレートし、以下を検証します:</p>
+    <ul>
+      <li>✅ ライブラリの読み込み</li>
+      <li>✅ グローバル変数 <code>window.HeatmapAnalytics</code> の存在確認</li>
+      <li>✅ 初期化処理</li>
+      <li>✅ セッションID・匿名IDの生成</li>
+      <li>✅ イベント記録</li>
+    </ul>
+  </div>
+
+  <div class="test-section">
+    <h2>🔄 テスト状況</h2>
+    <div id="test-status">
+      <div class="status pending">⏳ テスト準備中...</div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>📊 テストログ</h2>
+    <div id="test-log" style="max-height: 400px; overflow-y: auto; background: white; padding: 10px; border-radius: 4px;">
+      <div class="log-entry info">[00:00:00] テスト開始...</div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🎮 手動テスト</h2>
+    <p>ライブラリが正しく読み込まれた後、以下のボタンでイベントをテストできます:</p>
+    <button id="test-click-btn">クリックイベントをテスト</button>
+    <button id="test-scroll-btn">スクロールイベントをテスト</button>
+    <button id="clear-data-btn">データをクリア</button>
+  </div>
+
+  <div class="test-section">
+    <h2>💾 LocalStorageデータ</h2>
+    <pre id="local-storage-data">データを取得中...</pre>
+    <button id="refresh-storage-btn">最新データを表示</button>
+  </div>
+
+  <!--
+    GTMカスタムHTMLタグのシミュレーション
+    実際のGTMでは以下のコードがカスタムHTMLタグに貼り付けられます
+  -->
+  <script>
+    (function() {
+      'use strict';
+
+      const testLog = document.getElementById('test-log');
+      const testStatus = document.getElementById('test-status');
+      let startTime = Date.now();
+
+      function addLog(message, type = 'info') {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${type}`;
+        logEntry.textContent = `[${elapsed}s] ${message}`;
+        testLog.appendChild(logEntry);
+        testLog.scrollTop = testLog.scrollHeight;
+      }
+
+      function updateStatus(message, type = 'pending') {
+        testStatus.innerHTML = `<div class="status ${type}">${message}</div>`;
+      }
+
+      function displayLocalStorageData() {
+        const storageData = document.getElementById('local-storage-data');
+        try {
+          const data = localStorage.getItem('heatmap_analytics_data');
+          if (data) {
+            const parsed = JSON.parse(data);
+            storageData.textContent = JSON.stringify(parsed, null, 2);
+          } else {
+            storageData.textContent = 'データがまだ保存されていません。';
+          }
+        } catch (error) {
+          storageData.textContent = `エラー: ${error.message}`;
+        }
+      }
+
+      // GTMカスタムHTMLタグのシミュレーション開始
+      addLog('GTMカスタムHTMLタグのシミュレーション開始', 'info');
+      updateStatus('⏳ ライブラリを読み込み中...', 'pending');
+
+      // ライブラリが読み込まれるまで待機
+      let checkInterval = setInterval(function() {
+        if (window.HeatmapAnalytics) {
+          clearInterval(checkInterval);
+          addLog('✅ window.HeatmapAnalytics が見つかりました', 'success');
+
+          try {
+            // 初期化
+            addLog('初期化処理を開始...', 'info');
+            const tracker = new window.HeatmapAnalytics({
+              api: {
+                apiKey: 'gtm-integration-test',
+                projectId: 'test-project',
+                baseUrl: 'https://api.connected-one.com/v1'
+              },
+              debug: true,
+              autoStart: true,
+            });
+
+            tracker.init();
+            window.heatmapTracker = tracker;
+
+            addLog('✅ ヒートマップ初期化完了', 'success');
+            addLog(`📊 Session ID: ${tracker.getSessionId()}`, 'info');
+            addLog(`👤 Anonymous ID: ${tracker.getAnonymousId()}`, 'info');
+
+            updateStatus('✅ GTM統合テスト成功！ライブラリが正常に動作しています', 'success');
+
+            // LocalStorageデータを表示
+            displayLocalStorageData();
+
+            // 手動テストボタンのイベントリスナー
+            document.getElementById('test-click-btn').addEventListener('click', function() {
+              addLog('🖱️ クリックイベントをテストしました', 'success');
+              alert('クリックイベントがヒートマップに記録されました！');
+              displayLocalStorageData();
+            });
+
+            document.getElementById('test-scroll-btn').addEventListener('click', function() {
+              addLog('📜 スクロールイベントをテストしました', 'success');
+              window.scrollTo({ top: 500, behavior: 'smooth' });
+              setTimeout(() => {
+                displayLocalStorageData();
+              }, 1000);
+            });
+
+            document.getElementById('clear-data-btn').addEventListener('click', function() {
+              if (confirm('データをクリアしますか？')) {
+                tracker.clearData();
+                addLog('🗑️ データをクリアしました', 'info');
+                displayLocalStorageData();
+              }
+            });
+
+            document.getElementById('refresh-storage-btn').addEventListener('click', function() {
+              displayLocalStorageData();
+              addLog('🔄 LocalStorageデータを更新しました', 'info');
+            });
+
+          } catch (error) {
+            addLog(`❌ 初期化エラー: ${error.message}`, 'error');
+            updateStatus(`❌ エラー: ${error.message}`, 'error');
+            console.error(error);
+          }
+        }
+      }, 100);
+
+      // 10秒経ってもライブラリが読み込まれない場合はタイムアウト
+      setTimeout(function() {
+        if (!window.HeatmapAnalytics) {
+          clearInterval(checkInterval);
+          addLog('❌ タイムアウト: ヒートマップライブラリが読み込まれませんでした', 'error');
+          updateStatus('❌ テスト失敗: ライブラリが読み込まれませんでした', 'error');
+        }
+      }, 10000);
+
+    })();
+  </script>
+
+  <!--
+    ヒートマップライブラリ本体を読み込み
+    実際のGTMでは、カスタムHTMLタグ内でこのように読み込みます
+  -->
+  <script src="https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/heatmap-analytics.umd.js"></script>
+</body>
+</html>

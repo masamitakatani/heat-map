@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コネクティッドワン担当者様へ - ヒートマップツール統合のご確認</title>
+  <style>
+    /* ===== 基本設定 ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background: #fff;
+      padding: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ===== PDF印刷用設定 ===== */
+    @media print {
+      body {
+        padding: 20px;
+        font-size: 11pt;
+      }
+
+      h1 {
+        font-size: 20pt;
+        page-break-after: avoid;
+      }
+
+      h2 {
+        font-size: 16pt;
+        page-break-after: avoid;
+        margin-top: 20pt;
+      }
+
+      h3 {
+        font-size: 13pt;
+        page-break-after: avoid;
+      }
+
+      table, .architecture, .comparison, .info-box {
+        page-break-inside: avoid;
+      }
+
+      .no-print {
+        display: none;
+      }
+
+      a {
+        color: #1976d2;
+        text-decoration: none;
+      }
+
+      a::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #666;
+      }
+    }
+
+    /* ===== タイポグラフィ ===== */
+    h1 {
+      font-size: 28px;
+      color: #1976d2;
+      border-bottom: 4px solid #1976d2;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      font-size: 22px;
+      color: #424242;
+      border-left: 5px solid #1976d2;
+      padding-left: 15px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 18px;
+      color: #424242;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    h4 {
+      font-size: 16px;
+      color: #666;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 15px;
+    }
+
+    /* ===== リスト ===== */
+    ul, ol {
+      margin-left: 25px;
+      margin-bottom: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* ===== テーブル ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 25px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 14px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #1976d2;
+      color: white;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* ===== 情報ボックス ===== */
+    .info-box {
+      background: #e3f2fd;
+      border-left: 5px solid #1976d2;
+      padding: 20px;
+      margin: 25px 0;
+      border-radius: 4px;
+    }
+
+    .info-box.success {
+      background: #e8f5e9;
+      border-left-color: #4caf50;
+    }
+
+    .info-box.warning {
+      background: #fff3e0;
+      border-left-color: #ff9800;
+    }
+
+    .info-box.error {
+      background: #ffebee;
+      border-left-color: #f44336;
+    }
+
+    .info-box h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #1976d2;
+    }
+
+    .info-box.success h4 {
+      color: #4caf50;
+    }
+
+    .info-box.warning h4 {
+      color: #ff9800;
+    }
+
+    .info-box.error h4 {
+      color: #f44336;
+    }
+
+    /* ===== アーキテクチャ図 ===== */
+    .architecture {
+      background: #f5f5f5;
+      border: 2px solid #ddd;
+      padding: 25px;
+      margin: 25px 0;
+      border-radius: 8px;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .architecture-box {
+      border: 2px solid #1976d2;
+      padding: 15px;
+      margin: 10px 0;
+      background: white;
+      border-radius: 4px;
+    }
+
+    .architecture-arrow {
+      text-align: center;
+      color: #1976d2;
+      font-size: 20px;
+      margin: 10px 0;
+    }
+
+    /* ===== 比較表 ===== */
+    .comparison {
+      margin: 30px 0;
+    }
+
+    .comparison-item {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    .comparison-item.selected {
+      border: 3px solid #4caf50;
+      background: #e8f5e9;
+    }
+
+    .comparison-item h4 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .status-badge.recommended {
+      background: #4caf50;
+      color: white;
+    }
+
+    .status-badge.not-recommended {
+      background: #f44336;
+      color: white;
+    }
+
+    /* ===== チェックリスト ===== */
+    .checklist {
+      list-style: none;
+      margin-left: 0;
+    }
+
+    .checklist li {
+      padding-left: 30px;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .checklist li.checked::before {
+      content: "✅";
+      position: absolute;
+      left: 0;
+      font-size: 18px;
+    }
+
+    .checklist li.unchecked::before {
+      content: "❌";
+      position: absolute;
+      left: 0;
+      font-size: 18px;
+    }
+
+    /* ===== ヘッダー・フッター ===== */
+    .document-header {
+      text-align: right;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .document-footer {
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 2px solid #ddd;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* ===== リンク ===== */
+    a {
+      color: #1976d2;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== 目次 ===== */
+    .toc {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 25px;
+      margin: 30px 0;
+      border-radius: 8px;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #1976d2;
+    }
+
+    .toc ol {
+      margin-left: 20px;
+    }
+
+    .toc a {
+      color: #424242;
+    }
+
+    /* ===== 印刷ボタン ===== */
+    .print-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+
+    .print-button:hover {
+      background: #1565c0;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ===== コード表示 ===== */
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      color: #d32f2f;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid #ddd;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: #333;
+    }
+
+    /* ===== 強調 ===== */
+    strong {
+      color: #1976d2;
+      font-weight: bold;
+    }
+
+    .highlight {
+      background: #ffeb3b;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <button class="print-button no-print" onclick="window.print()">📄 PDFで保存</button>
+
+  <div class="document-header">
+    <div>作成日: 2025年11月3日</div>
+    <div>バージョン: 1.0</div>
+  </div>
+
+  <h1>コネクティッドワン担当者様へ<br>ヒートマップツール統合のご確認</h1>
+
+  <div class="info-box">
+    <h4>📧 ご挨拶</h4>
+    <p>いつもお世話になっております。</p>
+    <p>この度、コネクティッドワンのユーザー向けに<strong>ヒートマップ & ファネル解析ツール</strong>を開発しております。</p>
+    <p>つきましては、統合方式について貴社の見解をお伺いしたく、本ドキュメントをお送りいたします。</p>
+  </div>
+
+  <!-- 目次 -->
+  <div class="toc">
+    <h3>📋 目次</h3>
+    <ol>
+      <li><a href="#section1">開発中のツール概要</a></li>
+      <li><a href="#section2">発生した問題</a></li>
+      <li><a href="#section3">検討した解決策</a></li>
+      <li><a href="#section4">採用予定の方式（GTM統合）</a></li>
+      <li><a href="#section5">貴社へのご確認事項</a></li>
+      <li><a href="#section6">参考資料</a></li>
+      <li><a href="#section7">今後の流れ</a></li>
+      <li><a href="#section8">お問い合わせ先</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. 開発中のツール概要 -->
+  <h2 id="section1">1. 開発中のツール概要</h2>
+
+  <h3>1.1 ツールの目的</h3>
+  <p>コネクティッドワンで作成したLP（ランディングページ）のユーザー行動を可視化し、CVR改善に役立てるツールです。</p>
+
+  <h3>1.2 主要機能</h3>
+  <ul>
+    <li><strong>クリックヒートマップ</strong>: ユーザーのクリック位置を可視化</li>
+    <li><strong>スクロールヒートマップ</strong>: ページのスクロール深度を計測</li>
+    <li><strong>ファネル解析</strong>: ステップ間の遷移率・離脱率を分析</li>
+  </ul>
+
+  <h3>1.3 ターゲットユーザー</h3>
+  <ul>
+    <li>コネクティッドワンユーザー（マーケター、個人起業家、LP運営者）</li>
+    <li>自社LPに訪れたエンドユーザーの行動を分析したい方</li>
+  </ul>
+
+  <h3>1.4 技術仕様</h3>
+  <table>
+    <tr>
+      <th>項目</th>
+      <th>内容</th>
+    </tr>
+    <tr>
+      <td>形式</td>
+      <td>JavaScriptライブラリ</td>
+    </tr>
+    <tr>
+      <td>ファイルサイズ</td>
+      <td>9.30KB（gzip圧縮後）</td>
+    </tr>
+    <tr>
+      <td>データ保存</td>
+      <td>ブラウザのLocalStorage（サーバーレス）</td>
+    </tr>
+    <tr>
+      <td>配信方法</td>
+      <td>Vercel CDN経由</td>
+    </tr>
+    <tr>
+      <td>維持費</td>
+      <td>ゼロ（完全無料）</td>
+    </tr>
+    <tr>
+      <td>実装進捗</td>
+      <td>100%完了（Phase 1-11完了）</td>
+    </tr>
+    <tr>
+      <td>テスト結果</td>
+      <td>126/174テスト成功（失敗0件）</td>
+    </tr>
+  </table>
+
+  <!-- 2. 発生した問題 -->
+  <h2 id="section2">2. 発生した問題</h2>
+
+  <h3>2.1 問題の詳細</h3>
+  <div class="info-box error">
+    <h4>⚠️ JavaScriptコードが保存できない</h4>
+    <p>コネクティッドワンのページビルダーで、<strong>カスタムJavaScriptコードが保存できない</strong>ことが判明しました。</p>
+  </div>
+
+  <h3>2.2 試行した方法（すべて失敗）</h3>
+  <p>以下の場所でJavaScript（<code>&lt;script&gt;</code>タグ）の貼り付けを試みましたが、すべて保存できませんでした:</p>
+
+  <table>
+    <tr>
+      <th>試行箇所</th>
+      <th>結果</th>
+    </tr>
+    <tr>
+      <td>ページヘッダーマークアップ</td>
+      <td><span style="color: #f44336; font-weight: bold;">❌ 保存不可</span></td>
+    </tr>
+    <tr>
+      <td>ページボディマークアップ</td>
+      <td><span style="color: #f44336; font-weight: bold;">❌ 保存不可</span></td>
+    </tr>
+    <tr>
+      <td>ページフッターマークアップ</td>
+      <td><span style="color: #f44336; font-weight: bold;">❌ 保存不可</span></td>
+    </tr>
+    <tr>
+      <td>HTMLブロック（ウィジェット）</td>
+      <td><span style="color: #f44336; font-weight: bold;">❌ 保存不可</span></td>
+    </tr>
+  </table>
+
+  <h3>2.3 保存できたもの</h3>
+  <ul class="checklist">
+    <li class="checked">Googleタグマネージャー（GTM）のコード</li>
+    <li class="checked">Facebookピクセルのコード</li>
+    <li class="checked">その他、ホワイトリスト登録済みと思われるツール</li>
+  </ul>
+
+  <h3>2.4 推測される原因</h3>
+  <p>セキュリティ上の理由から、コネクティッドワンは<strong class="highlight">ホワイトリスト方式</strong>でJavaScriptの保存を制限していると推測されます。</p>
+
+  <!-- 3. 検討した解決策 -->
+  <h2 id="section3">3. 検討した解決策</h2>
+
+  <p>以下の3つの方式を検討しました:</p>
+
+  <div class="comparison">
+    <!-- 案1: GTM統合（採用予定） -->
+    <div class="comparison-item selected">
+      <h4>
+        案1: Googleタグマネージャー（GTM）経由で配信
+        <span class="status-badge recommended">✅ 採用予定</span>
+      </h4>
+
+      <p><strong>概要:</strong></p>
+      <ul>
+        <li>コネワンでGTMコンテナを読み込み（✅保存可能）</li>
+        <li>GTM側でヒートマップライブラリを配信</li>
+      </ul>
+
+      <p><strong>メリット:</strong></p>
+      <ul class="checklist">
+        <li class="checked">コネワンで確実に保存できる（GTMは許可済み）</li>
+        <li class="checked">エンドユーザー全員のデータ収集が可能</li>
+        <li class="checked">規約違反リスクなし（正攻法）</li>
+        <li class="checked">維持費ゼロ</li>
+      </ul>
+
+      <p><strong>デメリット:</strong></p>
+      <ul>
+        <li>お客様にGTMアカウント作成を依頼する必要あり（5分程度）</li>
+      </ul>
+    </div>
+
+    <!-- 案2: Chrome拡張機能（不採用） -->
+    <div class="comparison-item">
+      <h4>
+        案2: Chrome拡張機能で自動注入
+        <span class="status-badge not-recommended">❌ 不採用</span>
+      </h4>
+
+      <p><strong>概要:</strong></p>
+      <ul>
+        <li>ブラウザ拡張機能でスクリプトを自動注入</li>
+      </ul>
+
+      <p><strong>不採用の理由:</strong></p>
+      <ul class="checklist">
+        <li class="unchecked">エンドユーザーのデータが取れない（拡張機能をインストールした人のみ）</li>
+        <li class="unchecked">お客様全員に拡張機能のインストールを依頼する必要あり</li>
+      </ul>
+    </div>
+
+    <!-- 案3: リバースプロキシ（不採用） -->
+    <div class="comparison-item">
+      <h4>
+        案3: リバースプロキシ（Cloudflare Workers）でスクリプト注入
+        <span class="status-badge not-recommended">❌ 不採用</span>
+      </h4>
+
+      <p><strong>概要:</strong></p>
+      <ul>
+        <li>お客様の独自ドメインをプロキシ経由にしてスクリプト自動注入</li>
+      </ul>
+
+      <p><strong>不採用の理由:</strong></p>
+      <ul class="checklist">
+        <li class="unchecked">コネクティッドワンの規約に抵触する可能性</li>
+        <li class="unchecked">DNS設定変更が必要（技術的ハードルが高い）</li>
+        <li class="unchecked">トラブル時のサポート負担が大きい</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 4. 採用予定の方式（GTM統合） -->
+  <h2 id="section4">4. 採用予定の方式（GTM統合）</h2>
+
+  <h3>4.1 アーキテクチャ</h3>
+
+  <div class="architecture">
+┌─────────────────────────────────────────┐
+│  コネクティッドワンLP                      │
+│  (お客様が作成したページ)                  │
+│                                         │
+│  &lt;script src="GTM-XXXXXXX"&gt;&lt;/script&gt;    │
+│  ↑ Googleタグ欄に貼り付け（✅保存可能）   │
+└─────────────────────────────────────────┘
+                ↓
+┌─────────────────────────────────────────┐
+│  Googleタグマネージャー（GTM）              │
+│  (Googleが提供する無料ツール)               │
+│                                         │
+│  カスタムHTMLタグでヒートマップを配信       │
+└─────────────────────────────────────────┘
+                ↓
+┌─────────────────────────────────────────┐
+│  Vercel CDN                             │
+│  (ヒートマップライブラリ: 9.30KB)          │
+└─────────────────────────────────────────┘
+                ↓
+        エンドユーザーのデータ収集
+  </div>
+
+  <h3>4.2 お客様の作業フロー</h3>
+
+  <table>
+    <tr>
+      <th style="width: 80px;">ステップ</th>
+      <th>作業内容</th>
+      <th style="width: 100px;">所要時間</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td><strong>GTMアカウント作成</strong><br>https://tagmanager.google.com/ でアカウント作成</td>
+      <td>5分</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>GTMコンテナIDを取得</strong><br>例: GTM-ABC1234</td>
+      <td>1分</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>コネワンの「Googleタグ」欄に貼り付け</strong><br>✅ これは保存できることを確認済み</td>
+      <td>2分</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>弊社がGTM側で設定完了</strong><br>お客様の追加作業なし</td>
+      <td>（弊社作業）</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>完了！</strong><br>エンドユーザーのデータが自動収集されます</td>
+      <td>-</td>
+    </tr>
+  </table>
+
+  <h3>4.3 コネクティッドワンへの影響</h3>
+
+  <table>
+    <tr>
+      <th>項目</th>
+      <th>影響</th>
+    </tr>
+    <tr>
+      <td>既存機能への影響</td>
+      <td><span style="color: #4caf50; font-weight: bold;">✅ なし</span>（GTMは既にサポート済みのツール）</td>
+    </tr>
+    <tr>
+      <td>サーバー負荷</td>
+      <td><span style="color: #4caf50; font-weight: bold;">✅ なし</span>（ヒートマップデータはクライアント側に保存）</td>
+    </tr>
+    <tr>
+      <td>セキュリティリスク</td>
+      <td><span style="color: #4caf50; font-weight: bold;">✅ なし</span>（GTMはGoogleが提供する信頼済みツール）</td>
+    </tr>
+    <tr>
+      <td>ページ速度への影響</td>
+      <td><span style="color: #4caf50; font-weight: bold;">✅ 最小限</span>（ライブラリは9.30KBのみ）</td>
+    </tr>
+  </table>
+
+  <!-- 5. 貴社へのご確認事項 -->
+  <h2 id="section5">5. 貴社へのご確認事項</h2>
+
+  <div class="info-box warning">
+    <h4>📝 主要な確認事項</h4>
+    <p>以下の点についてご確認をお願いいたします:</p>
+  </div>
+
+  <h3>✅ 確認1: GTM統合方式の利用可否</h3>
+  <div class="info-box">
+    <p><strong>質問:</strong></p>
+    <blockquote style="margin: 10px 0; padding-left: 15px; border-left: 3px solid #1976d2;">
+      Googleタグマネージャー（GTM）経由でヒートマップライブラリを配信する方式は、コネクティッドワンの利用規約上、問題ございませんか？
+    </blockquote>
+
+    <p><strong>補足:</strong></p>
+    <ul>
+      <li>GTMコンテナは既にコネワンで保存可能（ホワイトリスト登録済みと推測）</li>
+      <li>GTM側でカスタムHTMLタグを使用してヒートマップを配信</li>
+      <li>エンドユーザーのブラウザで実行されるJavaScriptライブラリ</li>
+    </ul>
+  </div>
+
+  <h3>✅ 確認2: カスタムJavaScript保存制限の仕様</h3>
+  <div class="info-box">
+    <p><strong>質問:</strong></p>
+    <blockquote style="margin: 10px 0; padding-left: 15px; border-left: 3px solid #1976d2;">
+      コネクティッドワンのページビルダーでカスタムJavaScript（<code>&lt;script&gt;</code>タグ）が保存できない仕様について、以下をご教示ください:
+    </blockquote>
+
+    <ol>
+      <li><strong>制限の目的</strong>: セキュリティ上の理由で正しいでしょうか？</li>
+      <li><strong>ホワイトリスト</strong>: 現在、どのツール/ドメインがホワイトリスト登録されていますか？</li>
+      <li><strong>ホワイトリスト申請</strong>: 弊社のVercel CDN（<code>https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/</code>）をホワイトリストに追加していただくことは可能でしょうか？</li>
+    </ol>
+
+    <p><strong>補足:</strong></p>
+    <p>ホワイトリスト追加が可能な場合、GTM不要で直接スクリプトタグが使用可能となり、お客様の手間が大幅に削減されます。</p>
+  </div>
+
+  <h3>✅ 確認3: 代替方法のご提案</h3>
+  <div class="info-box">
+    <p><strong>質問:</strong></p>
+    <blockquote style="margin: 10px 0; padding-left: 15px; border-left: 3px solid #1976d2;">
+      もし上記の方式が規約上問題がある場合、貴社から推奨される統合方法はございますか？
+    </blockquote>
+
+    <p><strong>例:</strong></p>
+    <ul>
+      <li>公式プラグイン/拡張機能としての提供</li>
+      <li>外部ツール連携APIの利用</li>
+      <li>その他の統合方法</li>
+    </ul>
+  </div>
+
+  <!-- 6. 参考資料 -->
+  <h2 id="section6">6. 参考資料</h2>
+
+  <h3>6.1 添付ドキュメント</h3>
+  <p>本ドキュメントと合わせて、以下の資料をご確認ください:</p>
+
+  <table>
+    <tr>
+      <th>ドキュメント名</th>
+      <th>内容</th>
+    </tr>
+    <tr>
+      <td>要件定義書<br><code>requirements.md</code></td>
+      <td>
+        ツールの詳細仕様<br>
+        GTM統合仕様（セクション12）
+      </td>
+    </tr>
+    <tr>
+      <td>GTM統合ガイド<br><code>GTM_INTEGRATION.md</code></td>
+      <td>
+        技術的な実装詳細<br>
+        アーキテクチャ図
+      </td>
+    </tr>
+    <tr>
+      <td>お客様向けマニュアル<br><code>CUSTOMER_MANUAL.md</code></td>
+      <td>
+        GTM統合の手順書<br>
+        トラブルシューティング
+      </td>
+    </tr>
+    <tr>
+      <td>GTMコードサンプル<br><code>gtm-codes/</code></td>
+      <td>
+        実際に使用するカスタムHTMLタグのコード
+      </td>
+    </tr>
+  </table>
+
+  <h3>6.2 デモページ</h3>
+  <p>実際の動作を確認できるデモページ:</p>
+  <ul>
+    <li><a href="https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/">https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/</a></li>
+    <li>※現在はスタンドアロンデモ。GTM統合版は貴社の許可後に実装予定</li>
+  </ul>
+
+  <h3>6.3 ライブラリ情報</h3>
+  <table>
+    <tr>
+      <th>項目</th>
+      <th>内容</th>
+    </tr>
+    <tr>
+      <td>CDN URL</td>
+      <td><code>https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/heatmap-analytics.umd.js</code></td>
+    </tr>
+    <tr>
+      <td>ファイルサイズ</td>
+      <td>9.30KB（gzip圧縮後）</td>
+    </tr>
+    <tr>
+      <td>ホスティング</td>
+      <td>Vercel（無料枠）</td>
+    </tr>
+    <tr>
+      <td>ソースコード</td>
+      <td>TypeScript（厳密型チェック済み）</td>
+    </tr>
+  </table>
+
+  <h3>6.4 個人情報保護</h3>
+
+  <h4>記録される情報</h4>
+  <table>
+    <tr>
+      <th>記録する</th>
+      <th>記録しない</th>
+    </tr>
+    <tr>
+      <td>
+        <ul class="checklist">
+          <li class="checked">クリック座標</li>
+          <li class="checked">スクロール位置</li>
+          <li class="checked">ページURL</li>
+          <li class="checked">匿名化セッションID</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="checklist">
+          <li class="unchecked">名前・メールアドレス</li>
+          <li class="unchecked">IPアドレス</li>
+          <li class="unchecked">入力フィールドの内容</li>
+          <li class="unchecked">Cookie情報</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <!-- 7. 今後の流れ -->
+  <h2 id="section7">7. 今後の流れ</h2>
+
+  <h3>7.1 ご回答後の対応</h3>
+  <p>貴社からのご回答を受け、以下のいずれかで進めさせていただきます:</p>
+
+  <h4>パターンA: GTM統合が問題ない場合</h4>
+  <ol>
+    <li>✅ GTM統合方式で実装を完了</li>
+    <li>✅ お客様向けマニュアルを整備</li>
+    <li>✅ コネワンユーザーへ提供開始</li>
+  </ol>
+
+  <h4>パターンB: ホワイトリスト追加が可能な場合</h4>
+  <ol>
+    <li>✅ Vercel CDNをホワイトリストに追加いただく</li>
+    <li>✅ 直接スクリプトタグで統合（GTM不要）</li>
+    <li>✅ お客様の手間が最小化</li>
+  </ol>
+
+  <h4>パターンC: 代替方法のご提案をいただいた場合</h4>
+  <ol>
+    <li>✅ ご提案いただいた方式で再設計</li>
+    <li>✅ 実装完了後に再度ご確認</li>
+    <li>✅ 提供開始</li>
+  </ol>
+
+  <h3>7.2 スケジュール（想定）</h3>
+  <table>
+    <tr>
+      <th>項目</th>
+      <th>期日</th>
+    </tr>
+    <tr>
+      <td>貴社ご回答</td>
+      <td>ご都合に合わせます</td>
+    </tr>
+    <tr>
+      <td>実装完了</td>
+      <td>ご回答から1週間以内</td>
+    </tr>
+    <tr>
+      <td>提供開始</td>
+      <td>実装完了後、即時</td>
+    </tr>
+  </table>
+
+  <!-- 8. お問い合わせ先 -->
+  <h2 id="section8">8. お問い合わせ先</h2>
+
+  <div class="info-box">
+    <p>本件に関するご質問は、以下までお気軽にお問い合わせください。</p>
+
+    <table style="margin-top: 15px;">
+      <tr>
+        <th style="width: 150px;">会社名</th>
+        <td>Gambit株式会社</td>
+      </tr>
+      <tr>
+        <th>担当者</th>
+        <td>高谷　允已</td>
+      </tr>
+      <tr>
+        <th>メール</th>
+        <td>info@gambit.host</td>
+      </tr>
+      <tr>
+        <th>電話</th>
+        <td>080-1125-1714</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- まとめ -->
+  <h2>9. まとめ</h2>
+
+  <h3>9.1 お願い事項</h3>
+  <p>以下についてご確認をお願いいたします:</p>
+
+  <ol>
+    <li>✅ <strong>GTM統合方式の利用可否</strong></li>
+    <li>✅ <strong>カスタムJavaScript保存制限の仕様</strong></li>
+    <li>✅ <strong>ホワイトリスト申請の可否</strong>（可能な場合）</li>
+  </ol>
+
+  <h3>9.2 期待する成果</h3>
+  <ul>
+    <li>コネワンユーザーがヒートマップツールを気軽に利用できる</li>
+    <li>LP改善によるCVR向上を支援</li>
+    <li>コネクティッドワンのエコシステムがより強力に</li>
+  </ul>
+
+  <div class="info-box success">
+    <p>お忙しいところ恐縮ですが、ご確認のほどよろしくお願いいたします。</p>
+    <p>何かご不明点がございましたら、お気軽にお問い合わせください。</p>
+  </div>
+
+  <!-- フッター -->
+  <div class="document-footer">
+    <p><strong>作成日</strong>: 2025年11月3日</p>
+    <p><strong>バージョン</strong>: 1.0</p>
+    <p><strong>発行元</strong>: Gambit株式会社</p>
+    <p><strong>担当者</strong>: 高谷　允已</p>
+    <p><strong>連絡先</strong>: info@gambit.host / 080-1125-1714</p>
+  </div>
+</body>
+</html>

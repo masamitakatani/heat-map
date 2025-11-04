@@ -1,0 +1,42 @@
+{
+  "name": "@heatmap-analytics/frontend",
+  "version": "0.1.0",
+  "description": "Heatmap & Funnel Analytics Tool - Lightweight JavaScript library for tracking user behavior",
+  "type": "module",
+  "main": "./dist/heatmap-analytics.umd.js",
+  "module": "./dist/heatmap-analytics.es.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/heatmap-analytics.es.js",
+      "require": "./dist/heatmap-analytics.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types",
+    "preview": "vite preview",
+    "size": "npm run build && gzip -c dist/heatmap-analytics.umd.js | wc -c"
+  },
+  "keywords": [
+    "heatmap",
+    "analytics",
+    "funnel",
+    "click-tracking",
+    "user-behavior",
+    "connected-one"
+  ],
+  "author": "ConnectedOne Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "@tanstack/query-core": "^5.90.6"
+  }
+}

@@ -1,0 +1,110 @@
+<!-- GTM カスタムHTMLタグ - ヒートマップライブラリ（カスタマイズ版） -->
+<!-- このコードをGoogleタグマネージャーの「カスタムHTML」タグに貼り付けてください -->
+
+<script>
+(function() {
+  'use strict';
+
+  // ========================================
+  // 📝 カスタマイズ設定
+  // ========================================
+  var CONFIG = {
+    // お客様ごとに固有のAPIキーを設定
+    apiKey: 'gtm-integration-customer-001',
+
+    // プロジェクトID（お客様識別用）
+    // 'auto' の場合、ドメイン名から自動生成（例: gambit.icu → gambit-icu）
+    projectId: 'auto',
+
+    // デバッグモード（本番環境では false にしてください）
+    debug: true,
+
+    // 自動開始（通常は true のままで OK）
+    autoStart: true,
+
+    // APIベースURL（通常は変更不要）
+    baseUrl: 'https://api.connected-one.com/v1'
+  };
+  // ========================================
+
+  // 既に読み込み済みの場合はスキップ
+  if (window.HeatmapAnalytics) {
+    console.log('⚠️ ヒートマップライブラリは既に読み込まれています');
+    return;
+  }
+
+  // プロジェクトIDの自動生成
+  var projectId = CONFIG.projectId === 'auto'
+    ? window.location.hostname.replace(/\./g, '-')
+    : CONFIG.projectId;
+
+  // ライブラリを動的に読み込む
+  var script = document.createElement('script');
+  script.src = 'https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/heatmap-analytics.umd.js';
+  script.async = true;
+
+  script.onload = function() {
+    if (CONFIG.debug) {
+      console.log('✅ ヒートマップライブラリ読み込み完了');
+    }
+
+    // 初期化
+    try {
+      var tracker = new window.HeatmapAnalytics({
+        api: {
+          apiKey: CONFIG.apiKey,
+          projectId: projectId,
+          baseUrl: CONFIG.baseUrl
+        },
+        debug: CONFIG.debug,
+        autoStart: CONFIG.autoStart,
+      });
+
+      tracker.init();
+      window.heatmapTracker = tracker;
+
+      if (CONFIG.debug) {
+        console.log('✅ ヒートマップ初期化完了');
+        console.log('📊 Session ID:', tracker.getSessionId());
+        console.log('👤 Anonymous ID:', tracker.getAnonymousId());
+        console.log('🔧 API Key:', CONFIG.apiKey);
+        console.log('📁 Project ID:', projectId);
+      }
+
+      // カスタムイベント送信（オプション）
+      // GTMのデータレイヤーに通知
+      if (window.dataLayer) {
+        window.dataLayer.push({
+          'event': 'heatmap_initialized',
+          'heatmap_session_id': tracker.getSessionId(),
+          'heatmap_anonymous_id': tracker.getAnonymousId()
+        });
+      }
+
+    } catch (error) {
+      console.error('❌ ヒートマップ初期化エラー:', error);
+
+      // エラーイベント送信（オプション）
+      if (window.dataLayer) {
+        window.dataLayer.push({
+          'event': 'heatmap_init_error',
+          'error_message': error.message
+        });
+      }
+    }
+  };
+
+  script.onerror = function() {
+    console.error('❌ ヒートマップライブラリの読み込みに失敗しました');
+
+    // エラーイベント送信（オプション）
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        'event': 'heatmap_load_error'
+      });
+    }
+  };
+
+  document.head.appendChild(script);
+})();
+</script>

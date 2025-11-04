@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヒートマップ & ファネル解析ツール - 動作デモ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 100px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero p {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .cta-button {
+      background-color: #ff6b6b;
+      color: white;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .features {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 60px;
+      color: #667eea;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #667eea;
+    }
+
+    .demo {
+      background-color: #f7f9fc;
+      padding: 80px 20px;
+    }
+
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .demo h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      color: #667eea;
+    }
+
+    .demo-area {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      min-height: 300px;
+    }
+
+    .demo-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .demo-button:hover {
+      background-color: #45a049;
+    }
+
+    .demo-button.secondary {
+      background-color: #2196F3;
+    }
+
+    .demo-button.secondary:hover {
+      background-color: #0b7dda;
+    }
+
+    .status-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .status-box h3 {
+      margin-bottom: 10px;
+      color: #2196F3;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 80px;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .hero p {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <h1>🔥 ヒートマップ & ファネル解析ツール</h1>
+    <p>ユーザー行動を可視化し、コンバージョン率を最大化</p>
+    <p style="font-size: 1rem; opacity: 0.8; margin-top: 20px;">
+      ✅ 完全動作デモ - ヒートマップが実際に記録されます
+    </p>
+  </section>
+
+  <section class="features">
+    <h2>3つの主要機能</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>📊 クリックヒートマップ</h3>
+        <p>ユーザーがどこをクリックしているか一目で把握。ホットスポットを特定し、UI改善に活用できます。</p>
+      </div>
+      <div class="feature-card">
+        <h3>📈 スクロールヒートマップ</h3>
+        <p>ページのどこまでスクロールされているか可視化。重要なコンテンツを最適な位置に配置できます。</p>
+      </div>
+      <div class="feature-card">
+        <h3>🎯 ファネル解析</h3>
+        <p>ユーザーの離脱ポイントを特定し、コンバージョン率を改善。Connected Oneと連携して強力な分析を実現します。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo" class="demo">
+    <div class="demo-container">
+      <h2>今すぐ試してみる</h2>
+
+      <div class="status-box">
+        <h3>📊 ヒートマップステータス</h3>
+        <div id="status">初期化中...</div>
+      </div>
+
+      <div class="demo-area">
+        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 30px;">
+          このページで実際にヒートマップ機能をお試しください！
+        </p>
+        <div style="text-align: center;">
+          <button class="demo-button" id="button-a">ボタンA</button>
+          <button class="demo-button secondary" id="button-b">ボタンB</button>
+          <button class="demo-button" id="button-c">ボタンC</button>
+        </div>
+        <p style="text-align: center; margin-top: 30px; color: #666;">
+          クリックするとヒートマップにデータが記録されます
+        </p>
+
+        <div style="margin-top: 40px; padding: 20px; background: #f0f0f0; border-radius: 5px;">
+          <h3 style="margin-bottom: 15px;">📝 記録されたイベント</h3>
+          <div id="event-log" style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+            イベントログがここに表示されます...
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Heatmap Analytics. All rights reserved.</p>
+    <p>Powered by Connected One</p>
+  </footer>
+
+  <!-- ヒートマップライブラリ統合 -->
+  <script src="https://heat-cvnvx2ln9-masamitakatani-4585s-projects.vercel.app/heatmap-analytics.umd.js"></script>
+  <script>
+    // イベントログ表示用
+    const eventLog = document.getElementById('event-log');
+    const statusDiv = document.getElementById('status');
+
+    function addLog(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString('ja-JP');
+      const logEntry = document.createElement('div');
+      logEntry.style.padding = '5px';
+      logEntry.style.borderBottom = '1px solid #ddd';
+
+      const color = type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3';
+      logEntry.innerHTML = `<span style="color: ${color}">[${timestamp}]</span> ${message}`;
+
+      eventLog.appendChild(logEntry);
+      eventLog.scrollTop = eventLog.scrollHeight;
+    }
+
+    // ライブラリ初期化
+    if (window.HeatmapAnalytics) {
+      try {
+        const tracker = new window.HeatmapAnalytics({
+          api: {
+            apiKey: 'demo-standalone-page',
+            projectId: 'demo-project',
+            baseUrl: 'https://api.connected-one.com/v1'
+          },
+          debug: true,
+          autoStart: true,
+        });
+
+        tracker.init();
+        window.heatmapTracker = tracker;
+
+        statusDiv.innerHTML = `
+          <strong style="color: #4CAF50">✅ ヒートマップ初期化完了</strong><br>
+          Session ID: ${tracker.getSessionId()}<br>
+          Anonymous ID: ${tracker.getAnonymousId()}
+        `;
+
+        addLog('✅ ヒートマップライブラリ初期化成功', 'success');
+        addLog(`📊 Session ID: ${tracker.getSessionId()}`, 'info');
+
+        // デモボタンのイベントリスナー
+        document.getElementById('button-a').addEventListener('click', function() {
+          addLog('🖱️ ボタンA がクリックされました', 'success');
+          alert('ボタンA をクリックしました！\nヒートマップにデータが記録されました。');
+        });
+
+        document.getElementById('button-b').addEventListener('click', function() {
+          addLog('🖱️ ボタンB がクリックされました', 'success');
+          alert('ボタンB をクリックしました！\nヒートマップにデータが記録されました。');
+        });
+
+        document.getElementById('button-c').addEventListener('click', function() {
+          addLog('🖱️ ボタンC がクリックされました', 'success');
+          alert('ボタンC をクリックしました！\nヒートマップにデータが記録されました。');
+        });
+
+        // スクロール追跡
+        let lastScrollY = 0;
+        window.addEventListener('scroll', function() {
+          const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          if (Math.abs(scrollY - lastScrollY) > 100) {
+            addLog(`📜 スクロール位置: ${scrollY}px`, 'info');
+            lastScrollY = scrollY;
+          }
+        });
+
+        addLog('✅ イベント追跡を開始しました', 'success');
+
+      } catch (error) {
+        statusDiv.innerHTML = `<strong style="color: #f44336">❌ エラー: ${error.message}</strong>`;
+        addLog(`❌ 初期化エラー: ${error.message}`, 'error');
+      }
+    } else {
+      statusDiv.innerHTML = '<strong style="color: #f44336">❌ ライブラリが読み込まれていません</strong>';
+      addLog('❌ HeatmapAnalyticsライブラリが見つかりません', 'error');
+    }
+
+    // LocalStorage確認ボタン（開発者向け）
+    console.log('💡 開発者向けTips:');
+    console.log('- LocalStorageを確認: localStorage.heatmap_analytics_data');
+    console.log('- トラッカーオブジェクト: window.heatmapTracker');
+  </script>
+</body>
+</html>
