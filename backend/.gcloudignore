@@ -1,0 +1,84 @@
+# ========================================
+# Cloud Run デプロイ時に除外するファイル
+# ========================================
+
+# Git関連
+.git
+.gitignore
+.github/
+
+# Python関連
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 環境変数ファイル（本番環境変数はCloud Runで設定）
+.env
+.env.local
+.env.*.local
+*.env
+
+# テスト関連
+tests/
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Alembic（マイグレーションファイルは含める）
+# alembic/versions/*.pyc
+
+# ドキュメント
+README.md
+SETUP.md
+API_IMPLEMENTATION.md
+*.md
+docs/
+
+# IDE・エディタ
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ログファイル
+*.log
+logs/
+
+# 一時ファイル
+*.tmp
+temp/
+tmp/
+
+# 開発用ツール
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Poetry（requirements.txtを使用）
+poetry.lock
+pyproject.toml
+
+# その他
+*.bak
+*.orig
+.cache/

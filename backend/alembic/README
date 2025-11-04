@@ -1,0 +1,36 @@
+# Alembic Database Migrations
+
+This directory contains database migrations for the Heatmap & Funnel Analysis backend.
+
+## Usage
+
+### Create initial migration
+```bash
+alembic revision --autogenerate -m "Initial migration"
+```
+
+### Apply migrations
+```bash
+alembic upgrade head
+```
+
+### Rollback migration
+```bash
+alembic downgrade -1
+```
+
+### Show migration history
+```bash
+alembic history
+```
+
+### Show current version
+```bash
+alembic current
+```
+
+## Notes
+
+- Migrations are run using async SQLAlchemy engine
+- Database URL is loaded from app.config.settings
+- All models must be imported in alembic/env.py

@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/**
+ * App Component
+ * ヒートマップ管理画面のメインコンポーネント
+ */
+
+import { useState } from 'react';
+import { PageList } from './components/PageList';
+import { HeatmapViewer } from './components/HeatmapViewer';
+import './App.css';
+
+type View = 'list' | 'heatmap';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentView, setCurrentView] = useState<View>('list');
+  const [selectedPageUrl, setSelectedPageUrl] = useState<string | null>(null);
+
+  const handleSelectPage = (pageUrl: string) => {
+    setSelectedPageUrl(pageUrl);
+    setCurrentView('heatmap');
+  };
+
+  const handleBackToList = () => {
+    setCurrentView('list');
+    setSelectedPageUrl(null);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app">
+      <header className="app-header">
+        <h1>ヒートマップ & ファネル解析ツール</h1>
+        <p className="subtitle">管理画面</p>
+      </header>
+
+      <main className="app-main">
+        {currentView === 'list' && <PageList onSelectPage={handleSelectPage} />}
+        {currentView === 'heatmap' && selectedPageUrl && (
+          <HeatmapViewer pageUrl={selectedPageUrl} onBack={handleBackToList} />
+        )}
+      </main>
+
+      <footer className="app-footer">
+        <p>&copy; 2025 Heatmap Analytics Tool</p>
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;

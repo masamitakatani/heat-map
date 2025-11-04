@@ -11,6 +11,7 @@ import { initApiClient } from './api/client';
 import { initQueryClient } from './api/queries';
 import { registerOnlineListener } from './api/webhook';
 import { registerGlobalErrorHandler } from './api/errorHandler';
+import { EventTracker } from './trackers/EventTracker';
 
 /**
  * HeatmapAnalyticsクラス
@@ -21,6 +22,7 @@ class HeatmapAnalytics {
   private sessionId: string;
   private anonymousId: string;
   private isInitialized: boolean = false;
+  private eventTracker: EventTracker | null = null;
 
   constructor(config: HeatmapConfig = {}) {
     this.config = {
@@ -123,9 +125,14 @@ class HeatmapAnalytics {
       console.log('[Heatmap] 記録開始');
     }
 
-    // Phase 4で実装予定:
-    // - イベントリスナー登録
-    // - オーバーレイUI表示
+    // EventTrackerを初期化して開始
+    if (!this.eventTracker) {
+      this.eventTracker = new EventTracker(this.sessionId, {
+        mouseMoveInterval: this.config.samplingInterval?.mousemove,
+        scrollInterval: this.config.samplingInterval?.scroll,
+      });
+    }
+    this.eventTracker.start();
   }
 
   /**
@@ -136,8 +143,10 @@ class HeatmapAnalytics {
       console.log('[Heatmap] 記録停止');
     }
 
-    // Phase 4で実装予定:
-    // - イベントリスナー解除
+    // EventTrackerを停止
+    if (this.eventTracker) {
+      this.eventTracker.stop();
+    }
   }
 
   /**
