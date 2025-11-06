@@ -622,6 +622,13 @@ class HeatmapAnalytics {
   public getAllFunnelStats() {
     return calculateAllFunnelStats();
   }
+
+  /**
+   * オーバーレイUIの統計を更新
+   */
+  public refreshOverlayStats(): void {
+    this.overlayUI.refreshStats();
+  }
 }
 
 // グローバルに公開

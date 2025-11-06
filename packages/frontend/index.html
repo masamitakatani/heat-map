@@ -203,16 +203,21 @@
       <div class="info-box">
         <h4>📊 ヒートマップを表示する手順</h4>
         <p>
+          <strong>⚠️ 重要：ヒートマップはリアルタイムで色が変わりません</strong><br>
+          過去に記録されたデータを後から可視化します。<br>
+          <br>
           <strong>方法1: テストデータで即確認（おすすめ）</strong><br>
-          1. 下の「テストデータを生成」ボタンをクリック<br>
+          1. 下の「🧪 テストデータを生成」ボタンをクリック<br>
           2. 画面右下の「ヒートマップ分析」パネルを開く<br>
-          3. 表示モードを選択（クリック / スクロール / マウス移動）<br>
+          3. 「スクロール」を選択<br>
           4. 「ヒートマップを表示」ボタンをクリック<br>
-          5. 色の変化を確認（赤=よく見られた、青=あまり見られていない）<br>
+          5. <strong>ページ全体が色分けされます</strong>（赤=よく見られた、青=あまり見られていない）<br>
           <br>
           <strong>方法2: 実際にデータを蓄積</strong><br>
-          1. このページでクリックやスクロールをする<br>
-          2. 画面右下の「ヒートマップ分析」パネルからヒートマップを表示
+          1. このページを何度もスクロール（上下に移動）<br>
+          2. データがLocalStorageに保存される<br>
+          3. 画面右下の「ヒートマップ分析」パネルを開く<br>
+          4. 「ヒートマップを表示」で過去のスクロールデータが色で表示される
         </p>
       </div>
 
@@ -353,12 +358,48 @@
     // 初期化
     heatmap.init();
 
+    // グローバルに公開（テストデータ生成用）
+    window.heatmapInstance = heatmap;
+
     console.log('✅ ヒートマップ分析ツールが初期化されました');
     console.log('📊 セッションID:', heatmap.getSessionId());
     console.log('🔑 匿名ID:', heatmap.getAnonymousId());
 
     // テストデータ生成ボタンのイベントリスナー
     document.getElementById('generate-test-data').addEventListener('click', function() {
+      // 既存のLocalStorageデータを読み込む
+      const existingDataStr = localStorage.getItem('heatmap_analytics_data');
+      let existingData = null;
+
+      if (existingDataStr) {
+        try {
+          existingData = JSON.parse(existingDataStr);
+        } catch (e) {
+          console.error('LocalStorage読み込みエラー:', e);
+        }
+      }
+
+      // 既存データがない場合は初期化
+      if (!existingData) {
+        existingData = {
+          overlayState: {
+            isVisible: false,
+            mode: 'scroll',
+          },
+          sessionId: heatmap.getSessionId(),
+          anonymousId: heatmap.getAnonymousId(),
+          pendingEvents: {
+            clicks: [],
+            scrolls: [],
+            mouseMoves: [],
+          },
+          overlayPosition: {
+            x: window.innerWidth - 320,
+            y: window.innerHeight - 200,
+          },
+        };
+      }
+
       // スクロールヒートマップのテストデータを生成
       const testScrollData = [];
 
@@ -402,14 +443,60 @@
         });
       }
 
-      // LocalStorageに保存
-      localStorage.setItem('heatmap_tool_scroll_data', JSON.stringify(testScrollData));
+      // 既存データのpendingEvents.scrollsに追加
+      existingData.pendingEvents.scrolls = testScrollData;
 
-      alert('✅ テストデータを生成しました！\n\n次の手順:\n1. 右下の「ヒートマップ分析」パネルを開く\n2. 「スクロール」を選択\n3. 「ヒートマップを表示」をクリック\n\n色の意味:\n🔴 赤 = 多くの人が見た（トップ）\n🟡 黄 = まあまあ見られた\n🔵 青 = あまり見られていない（下部）');
+      // LocalStorageに正しい形式で保存
+      localStorage.setItem('heatmap_analytics_data', JSON.stringify(existingData));
+
+      // UIの統計を更新
+      if (window.heatmapInstance) {
+        window.heatmapInstance.refreshOverlayStats();
+      }
+
+      alert('✅ テストデータを生成しました！（' + testScrollData.length + '件）\n\n次の手順:\n1. 右下の「ヒートマップ分析」パネルで「スクロール」を選択\n2. 「ヒートマップを表示」ボタンをクリック\n3. ページ全体が色分けされます\n\n色の意味:\n🔴 赤 = 多くの人が見た（トップ）\n🟡 黄 = まあまあ見られた\n🔵 青 = あまり見られていない（下部）');
+
+      console.log('📊 テストデータ生成完了:', {
+        scrollEvents: testScrollData.length,
+        data: existingData
+      });
     });
 
     // クリックヒートマップのテストデータ生成
     document.getElementById('generate-click-data').addEventListener('click', function() {
+      // 既存のLocalStorageデータを読み込む
+      const existingDataStr = localStorage.getItem('heatmap_analytics_data');
+      let existingData = null;
+
+      if (existingDataStr) {
+        try {
+          existingData = JSON.parse(existingDataStr);
+        } catch (e) {
+          console.error('LocalStorage読み込みエラー:', e);
+        }
+      }
+
+      // 既存データがない場合は初期化
+      if (!existingData) {
+        existingData = {
+          overlayState: {
+            isVisible: false,
+            mode: 'click',
+          },
+          sessionId: heatmap.getSessionId(),
+          anonymousId: heatmap.getAnonymousId(),
+          pendingEvents: {
+            clicks: [],
+            scrolls: [],
+            mouseMoves: [],
+          },
+          overlayPosition: {
+            x: window.innerWidth - 320,
+            y: window.innerHeight - 200,
+          },
+        };
+      }
+
       const testClickData = [];
 
       // ボタンエリアに集中したクリック（赤くなるはず）
@@ -442,10 +529,23 @@
         });
       }
 
-      // LocalStorageに保存
-      localStorage.setItem('heatmap_tool_click_data', JSON.stringify(testClickData));
+      // 既存データのpendingEvents.clicksに追加
+      existingData.pendingEvents.clicks = testClickData;
 
-      alert('✅ クリックテストデータを生成しました！\n\n次の手順:\n1. 右下の「ヒートマップ分析」パネルを開く\n2. 「クリック」を選択\n3. 「ヒートマップを表示」をクリック\n\n赤い円が多く重なるエリアがよくクリックされた場所です。');
+      // LocalStorageに正しい形式で保存
+      localStorage.setItem('heatmap_analytics_data', JSON.stringify(existingData));
+
+      // UIの統計を更新
+      if (window.heatmapInstance) {
+        window.heatmapInstance.refreshOverlayStats();
+      }
+
+      alert('✅ クリックテストデータを生成しました！（' + testClickData.length + '件）\n\n次の手順:\n1. 右下の「ヒートマップ分析」パネルで「クリック」を選択\n2. 「ヒートマップを表示」ボタンをクリック\n3. 赤い円が多く重なるエリアがよくクリックされた場所です');
+
+      console.log('📊 クリックテストデータ生成完了:', {
+        clickEvents: testClickData.length,
+        data: existingData
+      });
     });
   </script>
 </body>

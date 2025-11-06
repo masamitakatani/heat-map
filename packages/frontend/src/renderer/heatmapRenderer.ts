@@ -15,8 +15,8 @@ const DEFAULT_RENDER_CONFIG: HeatmapRenderConfig = {
     high: '#FF0000', // 赤
   },
   opacity: {
-    min: 0.3,
-    max: 0.8,
+    min: 0.5, // より濃く（0.3 → 0.5）
+    max: 0.9, // より濃く（0.8 → 0.9）
   },
   gridSize: 20, // 20px単位でグリッド化
 };
@@ -101,17 +101,32 @@ export class HeatmapRenderer {
     // Canvas要素を作成
     this.canvas = document.createElement('canvas');
     this.canvas.id = 'heatmap-overlay-canvas';
-    this.canvas.style.position = 'fixed';
+    this.canvas.style.position = 'absolute';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
-    this.canvas.style.width = '100vw';
-    this.canvas.style.height = '100vh';
     this.canvas.style.pointerEvents = 'none'; // マウスイベントを透過
     this.canvas.style.zIndex = '999999'; // 最前面に表示
 
-    // Canvas解像度を設定
+    // ページ全体の高さを取得
+    const pageHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight
+    );
+
+    // Canvas解像度を設定（ページ全体のサイズ）
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    this.canvas.height = pageHeight;
+
+    // CSSでもサイズを明示的に設定
+    this.canvas.style.width = `${window.innerWidth}px`;
+    this.canvas.style.height = `${pageHeight}px`;
+
+    console.log('🎨 Canvas初期化:', {
+      width: this.canvas.width,
+      height: this.canvas.height,
+      styleWidth: this.canvas.style.width,
+      styleHeight: this.canvas.style.height
+    });
 
     // Canvasコンテキストを取得
     this.ctx = this.canvas.getContext('2d');
@@ -216,17 +231,46 @@ export class HeatmapRenderer {
     this.clear();
 
     if (!this.ctx || !this.canvas || scrollEvents.length === 0) {
+      console.warn('⚠️ スクロールヒートマップ描画スキップ:', {
+        ctx: !!this.ctx,
+        canvas: !!this.canvas,
+        eventsLength: scrollEvents.length
+      });
       return;
     }
 
-    // スクロール深度ごとの到達率を計算
-    const depthMap = new Map<number, number>();
-    scrollEvents.forEach((event) => {
-      const depth = Math.floor(event.depth_percent / 5) * 5; // 5%単位で丸める（より細かく）
-      depthMap.set(depth, (depthMap.get(depth) || 0) + 1);
+    console.log('📊 スクロールヒートマップ描画開始:', {
+      eventsCount: scrollEvents.length,
+      canvasWidth: this.canvas.width,
+      canvasHeight: this.canvas.height
     });
 
-    const maxCount = Math.max(...Array.from(depthMap.values()));
+    // 各スクロール深度に到達したユーザー数を計算
+    const depthReachMap = new Map<number, number>();
+
+    // 各イベントの深度をカウント（各イベントが到達した全ての深度を記録）
+    scrollEvents.forEach((event) => {
+      const depth = event.depth_percent;
+
+      // このイベントが到達した全ての深度を記録
+      for (let d = 0; d <= depth; d += 5) {
+        const roundedDepth = Math.floor(d / 5) * 5;
+        if (!depthReachMap.has(roundedDepth)) {
+          depthReachMap.set(roundedDepth, 0);
+        }
+        // 各イベントを個別にカウント
+        depthReachMap.set(roundedDepth, depthReachMap.get(roundedDepth)! + 1);
+      }
+    });
+
+    // 最大到達カウント数（通常はトップが最大）
+    const maxReachCount = Math.max(...Array.from(depthReachMap.values()));
+
+    console.log('📈 深度到達マップ:', {
+      depths: Array.from(depthReachMap.keys()).sort((a, b) => a - b),
+      counts: Array.from(depthReachMap.entries()).sort((a, b) => a[0] - b[0]),
+      maxReachCount
+    });
 
     // ページ全体の高さを取得
     const pageHeight = Math.max(
@@ -234,21 +278,38 @@ export class HeatmapRenderer {
       document.documentElement.scrollHeight
     );
 
+    console.log('📏 ページ高さ:', {
+      pageHeight,
+      bodyScrollHeight: document.body.scrollHeight,
+      documentScrollHeight: document.documentElement.scrollHeight
+    });
+
     // 各スクロール深度セクションを塗りつぶす
-    const sortedDepths = Array.from(depthMap.keys()).sort((a, b) => a - b);
+    const sortedDepths = Array.from(depthReachMap.keys()).sort((a, b) => a - b);
 
     sortedDepths.forEach((depth, index) => {
-      const count = depthMap.get(depth) || 0;
-      const nextDepth = sortedDepths[index + 1] || 100;
+      const reachCount = depthReachMap.get(depth) || 0;
+      const nextDepth = sortedDepths[index + 1] !== undefined ? sortedDepths[index + 1] : 100;
 
       // このセクションの開始位置と高さ
       const startY = (depth / 100) * pageHeight;
       const endY = (nextDepth / 100) * pageHeight;
       const sectionHeight = endY - startY;
 
-      const intensity = count / maxCount;
+      // 到達率でintensityを計算
+      const intensity = maxReachCount > 0 ? reachCount / maxReachCount : 0;
       const color = getHeatmapColor(intensity, this.config);
-      const opacity = getOpacity(intensity, this.config) * 0.6; // 少し透明度を下げる
+      const opacity = getOpacity(intensity, this.config);
+
+      console.log(`🎨 セクション描画 [${depth}%-${nextDepth}%]:`, {
+        startY,
+        endY,
+        sectionHeight,
+        reachCount,
+        intensity,
+        color,
+        opacity
+      });
 
       this.ctx!.fillStyle = color;
       this.ctx!.globalAlpha = opacity;
@@ -257,6 +318,8 @@ export class HeatmapRenderer {
 
     // 透明度をリセット
     this.ctx.globalAlpha = 1.0;
+
+    console.log('✅ スクロールヒートマップ描画完了');
   }
 
   /**
@@ -312,8 +375,18 @@ export class HeatmapRenderer {
       return;
     }
 
+    // ページ全体の高さを取得
+    const pageHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight
+    );
+
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    this.canvas.height = pageHeight;
+
+    // CSSサイズも更新
+    this.canvas.style.width = `${window.innerWidth}px`;
+    this.canvas.style.height = `${pageHeight}px`;
   }
 
   /**
