@@ -203,12 +203,26 @@
       <div class="info-box">
         <h4>📊 ヒートマップを表示する手順</h4>
         <p>
-          1. 画面右下の「ヒートマップ分析」パネルを開く<br>
-          2. 表示モードを選択（クリック / スクロール / マウス移動）<br>
-          3. 「ヒートマップを表示」ボタンをクリック<br>
-          4. このページでクリックやスクロールをしてデータを蓄積<br>
-          5. ヒートマップで可視化される様子を確認
+          <strong>方法1: テストデータで即確認（おすすめ）</strong><br>
+          1. 下の「テストデータを生成」ボタンをクリック<br>
+          2. 画面右下の「ヒートマップ分析」パネルを開く<br>
+          3. 表示モードを選択（クリック / スクロール / マウス移動）<br>
+          4. 「ヒートマップを表示」ボタンをクリック<br>
+          5. 色の変化を確認（赤=よく見られた、青=あまり見られていない）<br>
+          <br>
+          <strong>方法2: 実際にデータを蓄積</strong><br>
+          1. このページでクリックやスクロールをする<br>
+          2. 画面右下の「ヒートマップ分析」パネルからヒートマップを表示
         </p>
+      </div>
+
+      <div style="margin: 20px 0; text-align: center;">
+        <button id="generate-test-data" class="demo-button primary" style="font-size: 1.2em; padding: 20px 40px;">
+          🧪 テストデータを生成（スクロールヒートマップ）
+        </button>
+        <button id="generate-click-data" class="demo-button secondary" style="font-size: 1.2em; padding: 20px 40px; margin-left: 10px;">
+          🖱️ テストデータを生成（クリックヒートマップ）
+        </button>
       </div>
 
       <p>
@@ -342,6 +356,97 @@
     console.log('✅ ヒートマップ分析ツールが初期化されました');
     console.log('📊 セッションID:', heatmap.getSessionId());
     console.log('🔑 匿名ID:', heatmap.getAnonymousId());
+
+    // テストデータ生成ボタンのイベントリスナー
+    document.getElementById('generate-test-data').addEventListener('click', function() {
+      // スクロールヒートマップのテストデータを生成
+      const testScrollData = [];
+
+      // ページトップ（0-20%）: 100人が見た（赤くなるはず）
+      for (let i = 0; i < 100; i++) {
+        testScrollData.push({
+          depth_percent: Math.floor(Math.random() * 20),
+          max_scroll_y: Math.floor(Math.random() * 500),
+          page_height: document.body.scrollHeight,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // 中間（20-50%）: 50人が見た（黄色になるはず）
+      for (let i = 0; i < 50; i++) {
+        testScrollData.push({
+          depth_percent: 20 + Math.floor(Math.random() * 30),
+          max_scroll_y: 500 + Math.floor(Math.random() * 1000),
+          page_height: document.body.scrollHeight,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // 下部（50-80%）: 20人が見た（青っぽくなるはず）
+      for (let i = 0; i < 20; i++) {
+        testScrollData.push({
+          depth_percent: 50 + Math.floor(Math.random() * 30),
+          max_scroll_y: 1500 + Math.floor(Math.random() * 1000),
+          page_height: document.body.scrollHeight,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // 最下部（80-100%）: 5人しか見てない（青くなるはず）
+      for (let i = 0; i < 5; i++) {
+        testScrollData.push({
+          depth_percent: 80 + Math.floor(Math.random() * 20),
+          max_scroll_y: 2500 + Math.floor(Math.random() * 500),
+          page_height: document.body.scrollHeight,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // LocalStorageに保存
+      localStorage.setItem('heatmap_tool_scroll_data', JSON.stringify(testScrollData));
+
+      alert('✅ テストデータを生成しました！\n\n次の手順:\n1. 右下の「ヒートマップ分析」パネルを開く\n2. 「スクロール」を選択\n3. 「ヒートマップを表示」をクリック\n\n色の意味:\n🔴 赤 = 多くの人が見た（トップ）\n🟡 黄 = まあまあ見られた\n🔵 青 = あまり見られていない（下部）');
+    });
+
+    // クリックヒートマップのテストデータ生成
+    document.getElementById('generate-click-data').addEventListener('click', function() {
+      const testClickData = [];
+
+      // ボタンエリアに集中したクリック（赤くなるはず）
+      for (let i = 0; i < 50; i++) {
+        testClickData.push({
+          x: 200 + Math.floor(Math.random() * 300),
+          y: 800 + Math.floor(Math.random() * 100),
+          timestamp: new Date().toISOString(),
+          element: 'button'
+        });
+      }
+
+      // ヘッダーエリアにもクリック（黄色になるはず）
+      for (let i = 0; i < 25; i++) {
+        testClickData.push({
+          x: 300 + Math.floor(Math.random() * 400),
+          y: 100 + Math.floor(Math.random() * 200),
+          timestamp: new Date().toISOString(),
+          element: 'header'
+        });
+      }
+
+      // その他のエリア（青っぽくなるはず）
+      for (let i = 0; i < 10; i++) {
+        testClickData.push({
+          x: Math.floor(Math.random() * window.innerWidth),
+          y: 1000 + Math.floor(Math.random() * 1000),
+          timestamp: new Date().toISOString(),
+          element: 'div'
+        });
+      }
+
+      // LocalStorageに保存
+      localStorage.setItem('heatmap_tool_click_data', JSON.stringify(testClickData));
+
+      alert('✅ クリックテストデータを生成しました！\n\n次の手順:\n1. 右下の「ヒートマップ分析」パネルを開く\n2. 「クリック」を選択\n3. 「ヒートマップを表示」をクリック\n\n赤い円が多く重なるエリアがよくクリックされた場所です。');
+    });
   </script>
 </body>
 </html>

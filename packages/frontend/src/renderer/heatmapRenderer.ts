@@ -222,27 +222,37 @@ export class HeatmapRenderer {
     // スクロール深度ごとの到達率を計算
     const depthMap = new Map<number, number>();
     scrollEvents.forEach((event) => {
-      const depth = Math.floor(event.depth_percent / 10) * 10; // 10%単位で丸める
+      const depth = Math.floor(event.depth_percent / 5) * 5; // 5%単位で丸める（より細かく）
       depthMap.set(depth, (depthMap.get(depth) || 0) + 1);
     });
 
     const maxCount = Math.max(...Array.from(depthMap.values()));
 
-    // スクロール深度を視覚化（横線で表示）
+    // ページ全体の高さを取得
     const pageHeight = Math.max(
       document.body.scrollHeight,
       document.documentElement.scrollHeight
     );
 
-    depthMap.forEach((count, depth) => {
-      const y = (depth / 100) * pageHeight;
+    // 各スクロール深度セクションを塗りつぶす
+    const sortedDepths = Array.from(depthMap.keys()).sort((a, b) => a - b);
+
+    sortedDepths.forEach((depth, index) => {
+      const count = depthMap.get(depth) || 0;
+      const nextDepth = sortedDepths[index + 1] || 100;
+
+      // このセクションの開始位置と高さ
+      const startY = (depth / 100) * pageHeight;
+      const endY = (nextDepth / 100) * pageHeight;
+      const sectionHeight = endY - startY;
+
       const intensity = count / maxCount;
       const color = getHeatmapColor(intensity, this.config);
-      const opacity = getOpacity(intensity, this.config);
+      const opacity = getOpacity(intensity, this.config) * 0.6; // 少し透明度を下げる
 
       this.ctx!.fillStyle = color;
       this.ctx!.globalAlpha = opacity;
-      this.ctx!.fillRect(0, y, this.canvas!.width, 5); // 5px高さの横線
+      this.ctx!.fillRect(0, startY, this.canvas!.width, sectionHeight);
     });
 
     // 透明度をリセット
