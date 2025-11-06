@@ -8,12 +8,20 @@ venv/
 # Environment variables
 .env
 .env.local
+.env.production
+.env.staging
+.env.development
 .env.*.local
 
 # Build outputs
 dist/
 build/
+.next/
+.nuxt/
 *.log
+*.pid
+*.seed
+*.pid.lock
 
 # IDE
 .vscode/
@@ -27,5 +35,18 @@ Thumbs.db
 
 # Temporary files
 *.tmp
+*.temp
 temp/
 .vercel
+
+# Security & Secrets
+*.pem
+*.key
+*.cert
+credentials.json
+secrets.json
+
+# AI Assistant Conversations
+.gambit/
+.appgenius_temp/
+.claude/

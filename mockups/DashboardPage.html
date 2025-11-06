@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヒートマップツール - 管理ダッシュボード</title>
+    <style>
+        /* MUIテーマに準拠したスタイル */
+        :root {
+            --primary-color: #1976d2;
+            --secondary-color: #dc004e;
+            --background: #fafafa;
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --border-color: #e0e0e0;
+            --success-color: #2e7d32;
+            --warning-color: #ed6c02;
+            --error-color: #d32f2f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Roboto", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ヘッダー */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        /* メインコンテナ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ページタイトル */
+        .page-title {
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        /* 統計カードのグリッド */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .stat-card-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card-value {
+            font-size: 36px;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .stat-card-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stat-card-change {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .stat-card-change.positive {
+            background-color: rgba(46, 125, 50, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-card-change.negative {
+            background-color: rgba(211, 47, 47, 0.1);
+            color: var(--error-color);
+        }
+
+        /* チャートセクション */
+        .chart-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            margin-bottom: 32px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .chart-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-tab {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .chart-tab:hover {
+            background-color: var(--background);
+        }
+
+        .chart-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* モックチャート */
+        .mock-chart {
+            height: 300px;
+            background: linear-gradient(180deg,
+                rgba(25, 118, 210, 0.1) 0%,
+                rgba(25, 118, 210, 0.05) 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .chart-bar {
+            width: 60px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #1565c0 100%);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        /* テーブル */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            overflow-x: auto;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--background);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background-color: var(--background);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background-color: rgba(46, 125, 50, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.inactive {
+            background-color: rgba(158, 158, 158, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* ボタン */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(25, 118, 210, 0.05);
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .mock-chart {
+                height: 200px;
+            }
+
+            .chart-bar {
+                width: 40px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 24px;
+            }
+
+            .stat-card-value {
+                font-size: 28px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <h1>🔥 ヒートマップ & ファネル解析ツール</h1>
+    </header>
+
+    <!-- メインコンテナ -->
+    <div class="container">
+        <!-- ページタイトル -->
+        <h2 class="page-title">管理ダッシュボード</h2>
+
+        <!-- 統計カード -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-title">総訪問者数</div>
+                <div class="stat-card-value">12,847</div>
+                <div class="stat-card-subtitle">過去30日間</div>
+                <div class="stat-card-change positive">↑ 23.5%</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-title">クリック数</div>
+                <div class="stat-card-value">45,234</div>
+                <div class="stat-card-subtitle">過去30日間</div>
+                <div class="stat-card-change positive">↑ 12.3%</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-title">平均スクロール深度</div>
+                <div class="stat-card-value">68.5%</div>
+                <div class="stat-card-subtitle">ページ全体の平均</div>
+                <div class="stat-card-change negative">↓ 3.2%</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-title">ファネル通過率</div>
+                <div class="stat-card-value">24.7%</div>
+                <div class="stat-card-subtitle">オプトイン → サンクス</div>
+                <div class="stat-card-change positive">↑ 5.8%</div>
+            </div>
+        </div>
+
+        <!-- クリックヒートマップチャート -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3 class="chart-title">クリックヒートマップ推移</h3>
+                <div class="chart-tabs">
+                    <button class="chart-tab active">7日間</button>
+                    <button class="chart-tab">30日間</button>
+                    <button class="chart-tab">90日間</button>
+                </div>
+            </div>
+            <div class="mock-chart">
+                <div class="chart-bar" style="height: 60%;">
+                    <div class="chart-bar-label">月</div>
+                </div>
+                <div class="chart-bar" style="height: 80%;">
+                    <div class="chart-bar-label">火</div>
+                </div>
+                <div class="chart-bar" style="height: 45%;">
+                    <div class="chart-bar-label">水</div>
+                </div>
+                <div class="chart-bar" style="height: 90%;">
+                    <div class="chart-bar-label">木</div>
+                </div>
+                <div class="chart-bar" style="height: 70%;">
+                    <div class="chart-bar-label">金</div>
+                </div>
+                <div class="chart-bar" style="height: 55%;">
+                    <div class="chart-bar-label">土</div>
+                </div>
+                <div class="chart-bar" style="height: 40%;">
+                    <div class="chart-bar-label">日</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ページ別統計テーブル -->
+        <div class="table-container">
+            <h3 class="table-title">ページ別統計</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ページURL</th>
+                        <th>訪問者数</th>
+                        <th>平均滞在時間</th>
+                        <th>クリック数</th>
+                        <th>ステータス</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>/landing-page</td>
+                        <td>5,432</td>
+                        <td>2分35秒</td>
+                        <td>18,764</td>
+                        <td><span class="status-badge active">アクティブ</span></td>
+                        <td><button class="btn btn-secondary">詳細</button></td>
+                    </tr>
+                    <tr>
+                        <td>/product-page</td>
+                        <td>3,821</td>
+                        <td>3分12秒</td>
+                        <td>15,234</td>
+                        <td><span class="status-badge active">アクティブ</span></td>
+                        <td><button class="btn btn-secondary">詳細</button></td>
+                    </tr>
+                    <tr>
+                        <td>/thank-you</td>
+                        <td>2,156</td>
+                        <td>45秒</td>
+                        <td>4,567</td>
+                        <td><span class="status-badge active">アクティブ</span></td>
+                        <td><button class="btn btn-secondary">詳細</button></td>
+                    </tr>
+                    <tr>
+                        <td>/old-campaign</td>
+                        <td>421</td>
+                        <td>1分18秒</td>
+                        <td>1,234</td>
+                        <td><span class="status-badge inactive">停止中</span></td>
+                        <td><button class="btn btn-secondary">詳細</button></td>
+                    </tr>
+                    <tr>
+                        <td>/promo-2024</td>
+                        <td>1,017</td>
+                        <td>2分08秒</td>
+                        <td>5,435</td>
+                        <td><span class="status-badge active">アクティブ</span></td>
+                        <td><button class="btn btn-secondary">詳細</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // タブ切り替えのインタラクション
+        document.querySelectorAll('.chart-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // テーブル行のホバー効果
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                console.log('Row clicked:', this.querySelector('td').textContent);
+            });
+        });
+
+        // 詳細ボタンのクリックイベント
+        document.querySelectorAll('.btn-secondary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const pageUrl = this.closest('tr').querySelector('td').textContent;
+                alert(`${pageUrl} の詳細を表示します`);
+            });
+        });
+    </script>
+</body>
+</html>
